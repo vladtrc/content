@@ -2,7 +2,7 @@
 title: "LSM-дерево: индексирование под запись"
 kind: lecture
 course: ais
-order: 0
+order: 7
 draft: false
 format:
   html:
