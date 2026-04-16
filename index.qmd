@@ -2,7 +2,5 @@
 title: "prototype"
 ---
 
-- [Лекция: LSM-дерево](courses/ais/lsm-tree/index.qmd)
-- [Лекция: B-дерево](courses/ais/b-tree/index.qmd)
-- [Лекция: Индексы](courses/ais/indexes/index.qmd)
-- [Пост: Почему случайная проекция не совсем магия](posts/2026/03/jl-projection/index.qmd)
+- [Курс: Архитектура информационных систем](courses/ais/index.qmd)
+- [contextrot](posts/index.qmd)

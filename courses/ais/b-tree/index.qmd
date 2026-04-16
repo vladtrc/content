@@ -3,6 +3,7 @@ title: "B-дерево: индексирование на диске"
 kind: lecture
 course: ais
 order: 8
+module: 2
 draft: false
 format:
   html:

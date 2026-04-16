@@ -3,6 +3,7 @@ title: "Архитектурные стили и оценка продуктив
 kind: lecture
 course: ais
 order: 2
+module: 1
 draft: false
 format:
   html:

@@ -3,6 +3,7 @@ title: "Сетевая модель и контракты взаимодейст
 kind: lecture
 course: ais
 order: 3
+module: 1
 draft: false
 format:
   html:

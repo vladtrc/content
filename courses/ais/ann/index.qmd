@@ -3,6 +3,7 @@ title: "Приближённый поиск ближайших соседей (A
 kind: lecture
 course: ais
 order: 13
+module: 3
 draft: false
 format:
   html:

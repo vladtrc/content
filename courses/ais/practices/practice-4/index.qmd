@@ -1,0 +1,237 @@
+---
+title: "Практика 4: Специализированные индексы и поиск"
+kind: practice
+course: ais
+order: 104
+module: 5
+draft: false
+format:
+  html:
+    toc: true
+  typst:
+    toc: true
+---
+
+# Практика 4: Специализированные индексы и поиск
+
+## Предисловие
+
+Классические индексы (B-tree, hash) оптимизированы для точного поиска по ключу. Но многие задачи требуют *поиска похожих элементов*: текстовый поиск по словам, рекомендации по семантической близости, геопоиск "рядом со мной". Для этих задач используются специализированные структуры данных: Inverted Index, векторные индексы (HNSW, LSH), пространственные индексы (R-Tree).
+
+## Задание
+
+Для вашего варианта добавьте **три типа поиска**:
+
+**1. Полнотекстовый поиск (Inverted Index)**
+
+Реализуйте поиск по одному из:
+
+- Интернет-магазин: поиск товаров по названию и описанию
+- Социальная сеть: поиск постов по ключевым словам
+- Сервис бронирования: поиск отелей по названию и удобствам
+- Банк: поиск транзакций по описанию
+
+**Требования:**
+
+- Опишите структуру inverted index (term → list of documents)
+- Покажите пример запроса (AND/OR терминов)
+- Выберите решение: PostgreSQL full-text search, Elasticsearch, или custom
+- Обоснуйте выбор
+
+**2. Векторный поиск (Embeddings + ANN)**
+
+Реализуйте семантический поиск:
+
+- Интернет-магазин: "похожие товары" по описанию
+- Социальная сеть: рекомендации постов по интересам пользователя
+- Сервис бронирования: рекомендации отелей по предпочтениям
+- Банк: детекция подозрительных транзакций (аномалии)
+
+**Требования:**
+
+- Опишите, как создаются эмбеддинги (модель: BERT, sentence-transformers)
+- Выберите метрику близости: cosine similarity, L2, dot product
+- Выберите ANN-индекс: HNSW, LSH, IVF
+- Оцените размер индекса (число векторов × размерность × 4 байта)
+
+**3. Геопространственный поиск (только для магазина/бронирования/такси)**
+
+Если ваш сценарий подразумевает геоданные:
+
+- Интернет-магазин: поиск ближайших пунктов выдачи
+- Сервис бронирования: поиск отелей в радиусе 5 км
+
+**Требования:**
+
+- Выберите структуру: R-Tree, QuadTree, KD-Tree
+- Покажите пример запроса (range query, kNN)
+- Обоснуйте выбор
+
+**Формат ответа:** документ с описанием каждого типа поиска, примерами запросов и обоснованиями.
+
+## Пример
+
+**1. Полнотекстовый поиск товаров**
+
+**Задача:** пользователь вводит "беспроводные наушники bluetooth", нужно найти релевантные товары.
+
+**Решение: PostgreSQL Full-Text Search**
+
+Создание inverted index:
+
+```sql
+-- Добавляем tsvector колонку для поиска
+ALTER TABLE products ADD COLUMN search_vector tsvector;
+
+-- Создаём GIN индекс
+CREATE INDEX idx_products_search ON products USING GIN(search_vector);
+
+-- Заполняем search_vector (триггером при INSERT/UPDATE)
+UPDATE products SET search_vector =
+    to_tsvector('russian', name || ' ' || description);
+```
+
+Пример запроса:
+
+```sql
+SELECT id, name, ts_rank(search_vector, query) AS rank
+FROM products,
+     to_tsquery('russian', 'беспроводные & наушники & bluetooth') AS query
+WHERE search_vector @@ query
+ORDER BY rank DESC
+LIMIT 20;
+```
+
+**Как работает:**
+
+1. `to_tsvector` токенизирует текст → стемминг → вектор терминов
+   - "беспроводные наушники" → `'беспровод':1 'наушник':2`
+2. `to_tsquery` создаёт запрос с операторами AND (&), OR (|)
+3. GIN индекс: для каждого термина — список документов (posting list)
+4. `@@` оператор: пересечение posting lists для AND-запроса
+5. `ts_rank`: ранжирование по TF-IDF
+
+**Обоснование выбора PostgreSQL:**
+
+- Встроенная поддержка (не нужен отдельный сервис)
+- Достаточно для 100k товаров
+- Поддержка морфологии (русский, английский)
+- ❌ Elasticsearch был бы лучше для >1M товаров и сложного ранжирования
+
+**2. Векторный поиск похожих товаров**
+
+**Задача:** на странице товара показать "похожие товары" по описанию.
+
+**Решение: sentence-transformers + pgvector (PostgreSQL extension)**
+
+Создание эмбеддингов:
+
+```python
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer('paraphrase-multilingual-mpnet-base-v2')
+
+# Для каждого товара создаём эмбеддинг
+for product in products:
+    text = f"{product.name} {product.description}"
+    embedding = model.encode(text)  # 768-мерный вектор
+    # Сохраняем в БД
+```
+
+Схема БД:
+
+```sql
+CREATE EXTENSION vector;
+
+ALTER TABLE products ADD COLUMN embedding vector(768);
+
+-- Создаём HNSW индекс для быстрого поиска
+CREATE INDEX ON products USING hnsw (embedding vector_cosine_ops);
+```
+
+Поиск похожих товаров:
+
+```sql
+SELECT id, name,
+       1 - (embedding <=> $1::vector) AS similarity
+FROM products
+WHERE id != $2  -- исключаем сам товар
+ORDER BY embedding <=> $1::vector  -- косинусное расстояние
+LIMIT 10;
+```
+
+**Метрики:**
+
+- Размерность: 768
+- Метрика: **cosine similarity** (через `vector_cosine_ops`)
+  - Обоснование: длина вектора не важна, важен только смысл описания
+- Индекс: **HNSW** (Hierarchical Navigable Small World)
+  - Recall ~95%, latency ~1-5 мс для 100k векторов
+
+**Оценка размера:**
+
+```
+100,000 товаров × 768 dim × 4 байта = 307 МБ
+HNSW индекс добавляет ~2× overhead = 614 МБ
+Итого: ~1 ГБ (легко помещается в RAM)
+```
+
+**Альтернативы:**
+
+- ❌ **LSH**: хуже recall (~80%), но быстрее. Не нужно для 100k векторов.
+- ❌ **Faiss** (Facebook AI Similarity Search): избыточно, pgvector достаточно
+
+**3. Геопоиск пунктов выдачи**
+
+**Задача:** найти ближайшие 5 пунктов выдачи к адресу пользователя.
+
+**Решение: PostGIS (R-Tree)**
+
+Схема:
+
+```sql
+CREATE EXTENSION postgis;
+
+CREATE TABLE pickup_points (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    address VARCHAR(255),
+    location GEOMETRY(Point, 4326)  -- WGS84 координаты
+);
+
+-- Создаём GIST индекс (R-Tree)
+CREATE INDEX idx_pickup_location ON pickup_points USING GIST(location);
+```
+
+kNN запрос (5 ближайших):
+
+```sql
+SELECT id, name, address,
+       ST_Distance(location, ST_MakePoint(37.6173, 55.7558)::geography) AS distance_meters
+FROM pickup_points
+ORDER BY location <-> ST_MakePoint(37.6173, 55.7558)::geometry  -- kNN оператор
+LIMIT 5;
+```
+
+Range query (все пункты в радиусе 5 км):
+
+```sql
+SELECT id, name, address
+FROM pickup_points
+WHERE ST_DWithin(
+    location::geography,
+    ST_MakePoint(37.6173, 55.7558)::geography,
+    5000  -- 5 км в метрах
+);
+```
+
+**Обоснование R-Tree:**
+
+- Оптимален для точек (пункты выдачи)
+- Поддержка kNN и range queries
+- Встроен в PostGIS
+
+**Альтернативы:**
+
+- ❌ **QuadTree**: хорош для равномерных данных (игры), но пункты выдачи кластеризуются в городах
+- ❌ **KD-Tree**: тоже подошёл бы, но R-Tree лучше для неравномерных данных

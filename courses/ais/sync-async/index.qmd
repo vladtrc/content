@@ -3,6 +3,7 @@ title: "Синхронные и асинхронные модели взаимо
 kind: lecture
 course: ais
 order: 5
+module: 1
 draft: false
 format:
   html:

@@ -3,6 +3,7 @@ title: "Протоколы взаимодействия: HTTP, REST, gRPC, Graph
 kind: lecture
 course: ais
 order: 4
+module: 1
 draft: false
 format:
   html:

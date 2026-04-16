@@ -40,6 +40,14 @@ format:
 16. [Безопасность и управление доступом](security/index.qmd)
 17. [Observability: логирование, мониторинг и планирование задач](observability/index.qmd)
 
+**Модуль 5. Практические задания**
+
+18. [Практика 1: Проектирование API и взаимодействия](practices/practice-1/index.qmd)
+19. [Практика 2: Реализация спроектированного приложения](practices/practice-2/index.qmd)
+20. [Практика 3: OLTP-система и анализ производительности](practices/practice-3/index.qmd)
+21. [Практика 4: Специализированные индексы и поиск](practices/practice-4/index.qmd)
+22. [Практика 5: Операционные компоненты + OLAP](practices/practice-5/index.qmd)
+
 **Дополнительно**
 
 - [Индексы: B-tree, hash и bitmap](indexes/index.qmd)
@@ -58,23 +66,23 @@ format:
 - *Как приложения общаются?* — протоколы взаимодействия (REST, gRPC, GraphQL, WebSocket)
 :::
 
-{{< include introduction/index.qmd >}}
+{{< include introduction/_body.qmd >}}
 
 ---
 
-{{< include architecture-styles/index.qmd >}}
+{{< include architecture-styles/_body.qmd >}}
 
 ---
 
-{{< include network-model/index.qmd >}}
+{{< include network-model/_body.qmd >}}
 
 ---
 
-{{< include protocols/index.qmd >}}
+{{< include protocols/_body.qmd >}}
 
 ---
 
-{{< include sync-async/index.qmd >}}
+{{< include sync-async/_body.qmd >}}
 
 ---
 
@@ -88,23 +96,23 @@ format:
 Чтобы осознанно выбирать между PostgreSQL и ClickHouse, между Redis и MongoDB, нужно понимать внутреннее устройство этих систем. В этом модуле мы разберём фундаментальные структуры данных, лежащие в основе современных хранилищ.
 :::
 
-{{< include workload/index.qmd >}}
+{{< include workload/_body.qmd >}}
 
 ---
 
-{{< include lsm-tree/index.qmd >}}
+{{< include lsm-tree/_body.qmd >}}
 
 ---
 
-{{< include b-tree/index.qmd >}}
+{{< include b-tree/_body.qmd >}}
 
 ---
 
-{{< include acid-isolation/index.qmd >}}
+{{< include acid-isolation/_body.qmd >}}
 
 ---
 
-{{< include in-memory/index.qmd >}}
+{{< include in-memory/_body.qmd >}}
 
 ---
 
@@ -127,19 +135,19 @@ format:
 - *Geospatial Indexes* — для поиска по координатам (карты, доставка, такси)
 :::
 
-{{< include search-indexes/index.qmd >}}
+{{< include search-indexes/_body.qmd >}}
 
 ---
 
-{{< include embeddings/index.qmd >}}
+{{< include embeddings/_body.qmd >}}
 
 ---
 
-{{< include ann/index.qmd >}}
+{{< include ann/_body.qmd >}}
 
 ---
 
-{{< include geo/index.qmd >}}
+{{< include geo/_body.qmd >}}
 
 ---
 
@@ -157,16 +165,40 @@ format:
 Без этих компонентов приложение может работать локально, но в продакшене оно будет уязвимо к перегрузкам, атакам и непредсказуемым сбоям.
 :::
 
-{{< include proxy-rate-limit/index.qmd >}}
+{{< include proxy-rate-limit/_body.qmd >}}
 
 ---
 
-{{< include security/index.qmd >}}
+{{< include security/_body.qmd >}}
 
 ---
 
-{{< include observability/index.qmd >}}
+{{< include observability/_body.qmd >}}
 
 ---
 
-{{< include indexes/index.qmd >}}
+::: {.module-intro}
+# Модуль 5. Практические задания
+
+Теперь, когда мы изучили архитектурные паттерны, структуры хранения данных, методы поиска и операционные компоненты, пора применить знания на практике. Модуль содержит пять комплексных практических заданий, каждое из которых охватывает несколько лекций.
+
+*Цель практик:* научиться принимать архитектурные решения с обоснованием. В реальных проектах нет «правильного ответа» — есть компромиссы. Важно уметь объяснить *почему* вы выбрали PostgreSQL, а не MongoDB, *почему* используете REST, а не gRPC, *какие метрики* подтверждают, что система выдержит нагрузку.
+:::
+
+{{< include practices/practice-1/_body.qmd >}}
+
+---
+
+{{< include practices/practice-2/_body.qmd >}}
+
+---
+
+{{< include practices/practice-3/_body.qmd >}}
+
+---
+
+{{< include practices/practice-4/_body.qmd >}}
+
+---
+
+{{< include practices/practice-5/_body.qmd >}}

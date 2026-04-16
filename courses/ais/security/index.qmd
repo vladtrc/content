@@ -3,6 +3,7 @@ title: "Безопасность и управление доступом"
 kind: lecture
 course: ais
 order: 16
+module: 4
 draft: false
 format:
   html:

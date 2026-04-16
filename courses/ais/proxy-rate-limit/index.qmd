@@ -3,6 +3,7 @@ title: "Прокси и Rate Limiting"
 kind: lecture
 course: ais
 order: 15
+module: 4
 draft: false
 format:
   html:
