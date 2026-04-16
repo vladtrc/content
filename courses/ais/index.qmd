@@ -1,0 +1,28 @@
+---
+title: "AIS: полный курс"
+format:
+  html:
+    toc: true
+  typst:
+    toc: true
+---
+
+Сборная страница со всеми лекциями курса AIS. Доступна [версия для печати (PDF)](index.pdf).
+
+Отдельные лекции по прямым ссылкам:
+
+- [LSM-дерево: индексирование под запись](lsm-tree/index.qmd)
+- [B-дерево: индексирование на диске](b-tree/index.qmd)
+- [Индексы: B-tree, hash и bitmap](indexes/index.qmd)
+
+---
+
+{{< include lsm-tree/index.qmd >}}
+
+---
+
+{{< include b-tree/index.qmd >}}
+
+---
+
+{{< include indexes/index.qmd >}}

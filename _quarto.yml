@@ -1,0 +1,24 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "prototype"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: courses/index.qmd
+        text: Courses
+      - href: posts/index.qmd
+        text: Posts
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    lang: ru
+    css: styles/site.scss
+
+execute:
+  freeze: auto

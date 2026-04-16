@@ -1,0 +1,13 @@
+docs/
+.quarto/
+__pycache__/
+.venv/
+*.egg-info/
+assets/gen/
+plan.md
+target.md
+.manim/
+.codex
+
+/.quarto/
+**/*.quarto_ipynb

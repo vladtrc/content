@@ -1,0 +1,12 @@
+---
+title: "Courses"
+---
+
+# Courses
+
+## AIS
+
+- [Полный курс (одна страница + PDF)](ais/index.qmd)
+- [LSM-дерево: индексирование под запись](ais/lsm-tree/index.qmd)
+- [B-дерево: индексирование на диске](ais/b-tree/index.qmd)
+- [Индексы: B-tree, hash и bitmap](ais/indexes/index.qmd)
