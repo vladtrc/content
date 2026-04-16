@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Классификация нагрузки – prototype</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-4897d45d2f75ed4f519693be625836c5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Поиск не дал результатов",
+    "search-matching-documents-text": "Результаты поиска",
+    "search-copy-link-title": "Скопировать ссылку",
+    "search-hide-matches-text": "Скрыть дополнительные результаты",
+    "search-more-match-text": "дополнительный результат в этом документе",
+    "search-more-matches-text": "дополнительных результата(-ов) в этом документе",
+    "search-clear-button-title": "Очистить",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Отменить",
+    "search-submit-button-title": "Найти",
+    "search-label": "Поиск"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../../styles/site.scss">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">prototype</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Поиск"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Переключить навигацию" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../courses/index.html"> 
+<span class="menu-text">Courses</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../posts/index.html"> 
+<span class="menu-text">Posts</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Содержание</h2>
+   
+  <ul>
+  <li><a href="#классификация-нагрузки" id="toc-классификация-нагрузки" class="nav-link active" data-scroll-target="#классификация-нагрузки">Классификация нагрузки</a>
+  <ul class="collapse">
+  <li><a href="#типы-операций" id="toc-типы-операций" class="nav-link" data-scroll-target="#типы-операций">Типы операций</a></li>
+  <li><a href="#метрики-нагрузки" id="toc-метрики-нагрузки" class="nav-link" data-scroll-target="#метрики-нагрузки">Метрики нагрузки</a></li>
+  <li><a href="#характеристики-нагрузки" id="toc-характеристики-нагрузки" class="nav-link" data-scroll-target="#характеристики-нагрузки">Характеристики нагрузки</a></li>
+  <li><a href="#связь-метрик-от-dau-к-qps" id="toc-связь-метрик-от-dau-к-qps" class="nav-link" data-scroll-target="#связь-метрик-от-dau-к-qps">Связь метрик: от DAU к QPS</a></li>
+  <li><a href="#иерархия-памяти" id="toc-иерархия-памяти" class="nav-link" data-scroll-target="#иерархия-памяти">Иерархия памяти</a></li>
+  <li><a href="#оценка-производительности-littles-law" id="toc-оценка-производительности-littles-law" class="nav-link" data-scroll-target="#оценка-производительности-littles-law">Оценка производительности: Little’s Law</a></li>
+  <li><a href="#фундаментальные-компромиссы" id="toc-фундаментальные-компромиссы" class="nav-link" data-scroll-target="#фундаментальные-компромиссы">Фундаментальные компромиссы</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Другие форматы</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>Typst</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Классификация нагрузки</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="классификация-нагрузки" class="level1">
+<h1>Классификация нагрузки</h1>
+<p>Прежде чем выбирать базу данных или структуру хранения, нужно понять <strong>какая нагрузка</strong> будет на систему. База данных для интернет-магазина (миллионы мелких транзакций) и база данных для аналитики (сканирование миллиардов строк) требуют совершенно разных подходов.</p>
+<p>Эта лекция вводит классификацию нагрузок: - <strong>OLTP</strong> (Online Transaction Processing) — много коротких транзакций, чтение/запись отдельных строк (интернет-магазин, банковские переводы, бронирование билетов) - <strong>OLAP</strong> (Online Analytical Processing) — редкие, но тяжелые запросы, сканирование миллионов строк для агрегации (отчёты, бизнес-аналитика, data science)</p>
+<p>Для OLTP критично время отклика одной транзакции (миллисекунды), для OLAP — пропускная способность (миллионы строк в секунду). Отсюда разные структуры хранения: OLTP использует строковое хранение (B-tree), OLAP — колоночное (Parquet, ClickHouse).</p>
+<p>Лекция показывает, как оценить нагрузку через метрики (RPS, размер данных, паттерны доступа) и на основе этого выбрать подходящее хранилище.</p>
+<section id="типы-операций" class="level2">
+<h2 class="anchored" data-anchor-id="типы-операций">Типы операций</h2>
+<p>Зачастую взаимодействие с хранилищем сводится к ограниченному набору операций:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Тип</th>
+<th>Операция</th>
+<th>Пример</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Чтение</td>
+<td>Point lookup</td>
+<td><code>SELECT * FROM users WHERE id = 123</code></td>
+</tr>
+<tr class="even">
+<td>Чтение</td>
+<td>Multi-get</td>
+<td><code>SELECT * FROM users WHERE id IN (1, 2, 3)</code></td>
+</tr>
+<tr class="odd">
+<td>Чтение</td>
+<td>Range scan</td>
+<td><code>SELECT * FROM orders WHERE date BETWEEN '...' AND '...'</code></td>
+</tr>
+<tr class="even">
+<td>Чтение</td>
+<td>Prefix scan</td>
+<td><code>SELECT * FROM logs WHERE key LIKE 'user:123:%'</code></td>
+</tr>
+<tr class="odd">
+<td>Чтение</td>
+<td>Full scan</td>
+<td><code>SELECT AVG(price) FROM products</code></td>
+</tr>
+<tr class="even">
+<td>Запись</td>
+<td>Insert</td>
+<td>вставка новой записи (ошибка при дубликате)</td>
+</tr>
+<tr class="odd">
+<td>Запись</td>
+<td>Update</td>
+<td>изменение существующей записи</td>
+</tr>
+<tr class="even">
+<td>Запись</td>
+<td>Upsert</td>
+<td><code>INSERT ... ON CONFLICT DO UPDATE</code></td>
+</tr>
+<tr class="odd">
+<td>Запись</td>
+<td>Delete</td>
+<td>удаление записи</td>
+</tr>
+<tr class="even">
+<td>Запись</td>
+<td>Batch write</td>
+<td>запись нескольких записей</td>
+</tr>
+<tr class="odd">
+<td>Комб.</td>
+<td>Read-modify-write</td>
+<td><code>UPDATE accounts SET balance = balance + 100</code></td>
+</tr>
+<tr class="even">
+<td>Комб.</td>
+<td>Increment</td>
+<td><code>INCR views:page:123</code> (атомарный счётчик)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="метрики-нагрузки" class="level2">
+<h2 class="anchored" data-anchor-id="метрики-нагрузки">Метрики нагрузки</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Метрика</th>
+<th>Расшифровка</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>DAU</td>
+<td>Daily Active Users</td>
+<td>уникальные пользователи за сутки</td>
+</tr>
+<tr class="even">
+<td>MAU</td>
+<td>Monthly Active Users</td>
+<td>уникальные пользователи за месяц</td>
+</tr>
+<tr class="odd">
+<td>RPS</td>
+<td>Requests Per Second</td>
+<td>пользовательских запросов (например HTTP) в секунду</td>
+</tr>
+<tr class="even">
+<td>QPS</td>
+<td>Queries Per Second</td>
+<td>запросов к БД в секунду</td>
+</tr>
+<tr class="odd">
+<td>TPS</td>
+<td>Transactions Per Second</td>
+<td>транзакций БД в секунду</td>
+</tr>
+<tr class="even">
+<td>IOPS</td>
+<td>I/O Operations Per Second</td>
+<td>операций ввода-вывода в секунду</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="характеристики-нагрузки" class="level2">
+<h2 class="anchored" data-anchor-id="характеристики-нагрузки">Характеристики нагрузки</h2>
+<p><strong>Read/Write ratio:</strong> - <strong>90/10</strong> — преобладание чтения: кэширование, CDN, статический контент - <strong>50/50</strong> — сбалансированная: социальные сети, e-commerce - <strong>10/90</strong> — преобладание записи: логирование, IoT, метрики</p>
+<p><strong>Размер записи:</strong> - <strong>&lt; 1 KB</strong> — Метаданные, Сессия, счётчики - <strong>1-100 KB</strong> — JSON-документы, профили пользователей - <strong>100 KB - 1 MB</strong> — статьи, посты с изображениями - <strong>&gt; 1 MB</strong> — медиафайлы, бинарные данные</p>
+<p><strong>Паттерн доступа:</strong> - <strong>random</strong> — point lookup по ключу, случайные запросы - <strong>sequential</strong> — range scan, time-series, логи</p>
+<p><strong>Требования к латентности:</strong> - <strong>p50 &lt; 50 мс</strong> — медиана, типичный пользовательский опыт - <strong>p99 &lt; 200 мс</strong> — 1% худших запросов, важно для SLA - <strong>p999 &lt; 1 с</strong> — 0.1% худших, критично для финтеха</p>
+<p>Почему p99 важнее среднего: если p99 = 500 мс при 10000 QPS, то 100 запросов в секунду будут медленными — это 8.6 млн медленных запросов в сутки.</p>
+</section>
+<section id="связь-метрик-от-dau-к-qps" class="level2">
+<h2 class="anchored" data-anchor-id="связь-метрик-от-dau-к-qps">Связь метрик: от DAU к QPS</h2>
+<p>Ключевая задача — перевести бизнес-метрики (DAU) в технические (QPS, IOPS).</p>
+<p><strong>Полезные константы:</strong> секунд в сутках <span class="math inline">\(\approx 10^5\)</span> (точно: 86400), в месяце <span class="math inline">\(\approx 2.5 \times 10^6\)</span>, в году <span class="math inline">\(\approx 3 \times 10^7\)</span>.</p>
+<p><strong>Формула DAU → RPS:</strong> <span class="math display">\[\text{RPS}_\text{средний} = \frac{\text{DAU} \times \text{действий на пользователя}}{10^5}\]</span></p>
+<p><strong>Пример:</strong> 100K DAU, 20 действий/день → <span class="math inline">\(100000 \times 20 / 100000 = 20\)</span> RPS (средний).</p>
+<p><strong>Учёт пиков:</strong> нагрузка распределена неравномерно. Активные часы — 12 из 24, пиковые — 4 часа с нагрузкой в 3× от среднего.</p>
+<p><span class="math display">\[\text{RPS}_\text{пиковый} \approx \text{RPS}_\text{средний} \times 3\]</span></p>
+<p><strong>RPS → QPS:</strong> один HTTP-запрос может порождать несколько запросов к БД. - GET /products/:id → 1 SELECT (QPS = RPS) - POST /orders → BEGIN + 3 INSERT + 2 UPDATE + COMMIT (QPS ≈ 6 × RPS)</p>
+</section>
+<section id="иерархия-памяти" class="level2">
+<h2 class="anchored" data-anchor-id="иерархия-памяти">Иерархия памяти</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Уровень</th>
+<th>Латентность</th>
+<th>Пропускная способность</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>L1 cache</td>
+<td>~1 нс</td>
+<td>~1 ТБ/с</td>
+</tr>
+<tr class="even">
+<td>L2 cache</td>
+<td>~4 нс</td>
+<td>~500 ГБ/с</td>
+</tr>
+<tr class="odd">
+<td>L3 cache</td>
+<td>~12 нс</td>
+<td>~200 ГБ/с</td>
+</tr>
+<tr class="even">
+<td>RAM</td>
+<td>~100 нс</td>
+<td>~50 ГБ/с</td>
+</tr>
+<tr class="odd">
+<td>SSD (random)</td>
+<td>~100 мкс</td>
+<td>~500 МБ/с</td>
+</tr>
+<tr class="even">
+<td>SSD (seq)</td>
+<td>~50 мкс</td>
+<td>~3 ГБ/с</td>
+</tr>
+<tr class="odd">
+<td>HDD (random)</td>
+<td>~10 мс</td>
+<td>~1 МБ/с</td>
+</tr>
+<tr class="even">
+<td>HDD (seq)</td>
+<td>~5 мс</td>
+<td>~200 МБ/с</td>
+</tr>
+</tbody>
+</table>
+<p>Случайный доступ на HDD в 200 раз дороже последовательного. На SSD разница меньше (~5-10x), но всё ещё значительна.</p>
+<p><strong>Источник:</strong> таблица основана на данных Jeff Dean (Google) и Peter Norvig, актуализированных Colin Scott. См. <a href="https://gist.github.com/jboner/2841832">Latency Numbers Every Programmer Should Know</a> и <a href="https://colin-scott.github.io/personal_website/research/interactive_latency.html">Interactive Latency</a>.</p>
+</section>
+<section id="оценка-производительности-littles-law" class="level2">
+<h2 class="anchored" data-anchor-id="оценка-производительности-littles-law">Оценка производительности: Little’s Law</h2>
+<p>Как связать время запроса с пропускной способностью? <strong>Little’s Law</strong> — фундаментальный закон теории очередей:</p>
+<p><span class="math display">\[L = \lambda \times W\]</span></p>
+<p>Где <span class="math inline">\(L\)</span> — среднее число запросов в системе (concurrency), <span class="math inline">\(\lambda\)</span> — throughput (RPS), <span class="math inline">\(W\)</span> — среднее время обработки.</p>
+<p><strong>Применение для capacity planning:</strong> - Знаем <span class="math inline">\(W\)</span> (время запроса) и <span class="math inline">\(L\)</span> (число ядер) → находим <span class="math inline">\(\lambda\)</span> (max RPS) - Знаем <span class="math inline">\(\lambda\)</span> (целевой RPS) и <span class="math inline">\(L\)</span> → находим требуемое <span class="math inline">\(W\)</span></p>
+<p><strong>Пример:</strong> сервер с 28 ядрами, время запроса 1 мс: <span class="math display">\[\lambda = L / W = 28 / 0.001 = 28000 \text{ RPS (теоретический максимум)}\]</span></p>
+<p><strong>Реальность:</strong> накладные расходы (context switching, lock contention, GC) снижают эффективность. Коэффициент полезной работы — 0.3–0.5: <span class="math display">\[\lambda_\text{реальный} = 28000 \times 0.4 \approx 11000 \text{ RPS}\]</span></p>
+</section>
+<section id="фундаментальные-компромиссы" class="level2">
+<h2 class="anchored" data-anchor-id="фундаментальные-компромиссы">Фундаментальные компромиссы</h2>
+<p><strong>Read vs Write:</strong> оптимизация под чтение замедляет запись и наоборот.</p>
+<p><strong>Space vs Time:</strong> - <strong>Компрессия</strong> — тратим CPU за уменьшение места на диске - <strong>Денормализация</strong> — тратим место за скорость чтения - <strong>Индексы</strong> — тратим место и замедляем запись за ускорение чтения</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Скопировано");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Скопировано");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

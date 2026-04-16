@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Сетевая модель и контракты взаимодействия – prototype</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-4897d45d2f75ed4f519693be625836c5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Поиск не дал результатов",
+    "search-matching-documents-text": "Результаты поиска",
+    "search-copy-link-title": "Скопировать ссылку",
+    "search-hide-matches-text": "Скрыть дополнительные результаты",
+    "search-more-match-text": "дополнительный результат в этом документе",
+    "search-more-matches-text": "дополнительных результата(-ов) в этом документе",
+    "search-clear-button-title": "Очистить",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Отменить",
+    "search-submit-button-title": "Найти",
+    "search-label": "Поиск"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../../styles/site.scss">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">prototype</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Поиск"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Переключить навигацию" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../courses/index.html"> 
+<span class="menu-text">Courses</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../posts/index.html"> 
+<span class="menu-text">Posts</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Содержание</h2>
+   
+  <ul>
+  <li><a href="#сетевая-модель-и-контракты-взаимодействия" id="toc-сетевая-модель-и-контракты-взаимодействия" class="nav-link active" data-scroll-target="#сетевая-модель-и-контракты-взаимодействия">Сетевая модель и контракты взаимодействия</a>
+  <ul class="collapse">
+  <li><a href="#протокол-это-договор" id="toc-протокол-это-договор" class="nav-link" data-scroll-target="#протокол-это-договор">Протокол — это договор</a></li>
+  <li><a href="#модель-osi-семь-уровней-договорённостей" id="toc-модель-osi-семь-уровней-договорённостей" class="nav-link" data-scroll-target="#модель-osi-семь-уровней-договорённостей">Модель OSI: семь уровней договорённостей</a>
+  <ul class="collapse">
+  <li><a href="#как-уровни-строятся-друг-на-друге" id="toc-как-уровни-строятся-друг-на-друге" class="nav-link" data-scroll-target="#как-уровни-строятся-друг-на-друге">Как уровни строятся друг на друге</a></li>
+  <li><a href="#практическое-упрощение-tcpip" id="toc-практическое-упрощение-tcpip" class="nav-link" data-scroll-target="#практическое-упрощение-tcpip">Практическое упрощение: TCP/IP</a></li>
+  <li><a href="#tcp-vs-udp-два-подхода-к-доставке" id="toc-tcp-vs-udp-два-подхода-к-доставке" class="nav-link" data-scroll-target="#tcp-vs-udp-два-подхода-к-доставке">TCP vs UDP: два подхода к доставке</a></li>
+  </ul></li>
+  <li><a href="#http-прикладной-протокол-веба" id="toc-http-прикладной-протокол-веба" class="nav-link" data-scroll-target="#http-прикладной-протокол-веба">HTTP — прикладной протокол веба</a>
+  <ul class="collapse">
+  <li><a href="#структура-http-запроса" id="toc-структура-http-запроса" class="nav-link" data-scroll-target="#структура-http-запроса">Структура HTTP-запроса</a></li>
+  <li><a href="#структура-http-ответа" id="toc-структура-http-ответа" class="nav-link" data-scroll-target="#структура-http-ответа">Структура HTTP-ответа</a></li>
+  <li><a href="#http-методы" id="toc-http-методы" class="nav-link" data-scroll-target="#http-методы">HTTP-методы</a></li>
+  <li><a href="#коды-статуса" id="toc-коды-статуса" class="nav-link" data-scroll-target="#коды-статуса">Коды статуса</a></li>
+  <li><a href="#от-http-к-rest" id="toc-от-http-к-rest" class="nav-link" data-scroll-target="#от-http-к-rest">От HTTP к REST</a></li>
+  </ul></li>
+  <li><a href="#контракт-api-от-договорённости-к-спецификации" id="toc-контракт-api-от-договорённости-к-спецификации" class="nav-link" data-scroll-target="#контракт-api-от-договорённости-к-спецификации">Контракт API: от договорённости к спецификации</a>
+  <ul class="collapse">
+  <li><a href="#openapi-swagger-спецификация-rest-api" id="toc-openapi-swagger-спецификация-rest-api" class="nav-link" data-scroll-target="#openapi-swagger-спецификация-rest-api">OpenAPI (Swagger) — спецификация REST API</a></li>
+  <li><a href="#protocol-buffers-спецификация-grpc" id="toc-protocol-buffers-спецификация-grpc" class="nav-link" data-scroll-target="#protocol-buffers-спецификация-grpc">Protocol Buffers — спецификация gRPC</a></li>
+  <li><a href="#graphql-sdl-спецификация-graphql-api" id="toc-graphql-sdl-спецификация-graphql-api" class="nav-link" data-scroll-target="#graphql-sdl-спецификация-graphql-api">GraphQL SDL — спецификация GraphQL API</a></li>
+  <li><a href="#общий-принцип-спецификация-единый-источник-правды" id="toc-общий-принцип-спецификация-единый-источник-правды" class="nav-link" data-scroll-target="#общий-принцип-спецификация-единый-источник-правды">Общий принцип: спецификация = единый источник правды</a></li>
+  </ul></li>
+  <li><a href="#связь-уровней-osi-и-контрактов" id="toc-связь-уровней-osi-и-контрактов" class="nav-link" data-scroll-target="#связь-уровней-osi-и-контрактов">Связь уровней OSI и контрактов</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Другие форматы</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>Typst</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Сетевая модель и контракты взаимодействия</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="сетевая-модель-и-контракты-взаимодействия" class="level1">
+<h1>Сетевая модель и контракты взаимодействия</h1>
+<p>Прежде чем выбирать конкретный прикладной протокол (REST, gRPC, GraphQL), необходимо понять <strong>как вообще устроена передача данных между двумя программами</strong> и <strong>что такое контракт взаимодействия</strong>.</p>
+<section id="протокол-это-договор" class="level2">
+<h2 class="anchored" data-anchor-id="протокол-это-договор">Протокол — это договор</h2>
+<p>Протокол — это набор правил, по которым две стороны обмениваются данными. Без договорённости о формате, порядке и значении сообщений коммуникация невозможна.</p>
+<p>Пример из университетской жизни: чтобы получить справку в деканате, студент должен следовать протоколу — заполнить заявление по установленной форме (формат сообщения), подать его в определённое окно в рабочие часы (канал и адресация), дождаться обработки и получить ответ с печатью (формат ответа и подтверждение). Если студент напишет заявление в свободной форме, придёт не в тот кабинет или забудет номер студенческого — протокол нарушен и результата не будет. Между компьютерами происходит то же самое, только договорённости формализованы и многоуровневы.</p>
+<p>Ключевое свойство: каждый уровень коммуникации опирается на свой протокол, и верхние уровни <strong>не обязаны знать</strong>, как именно работают нижние. Это называется <strong>инкапсуляцией уровней</strong>.</p>
+</section>
+<section id="модель-osi-семь-уровней-договорённостей" class="level2">
+<h2 class="anchored" data-anchor-id="модель-osi-семь-уровней-договорённостей">Модель OSI: семь уровней договорённостей</h2>
+<p>Модель OSI (Open Systems Interconnection) описывает сетевое взаимодействие как стек из семи уровней. Каждый уровень решает свою задачу и предоставляет сервис уровню выше.</p>
+<section id="как-уровни-строятся-друг-на-друге" class="level3">
+<h3 class="anchored" data-anchor-id="как-уровни-строятся-друг-на-друге">Как уровни строятся друг на друге</h3>
+<p>Каждый следующий уровень — это новый договор, который опирается на возможности предыдущего. Построим стек снизу вверх:</p>
+<ol type="1">
+<li><p><strong>Есть провод</strong> (L1 — физический). Два компьютера соединены медным кабелем. Договариваемся: напряжение выше +0.5 В — это «1», ниже −0.5 В — это «0»; передаём с частотой 100 МГц.<br>
+<strong>Вход:</strong> электрический сигнал <code>+V −V −V +V +V −V −V +V</code>. <strong>Выход:</strong> поток битов <code>10011001</code>.</p></li>
+<li><p><strong>Разбиваем биты на кадры</strong> (L2 — канальный). Непрерывный поток битов бесполезен — неясно, где начало сообщения и кому оно адресовано. Договариваемся разбивать поток на <strong>кадры</strong> (frames): в начале каждого кадра — преамбула (фиксированная последовательность битов для синхронизации), затем MAC-адрес получателя (<code>AA:BB:CC:DD:EE:FF</code>), MAC-адрес отправителя, длина, полезная нагрузка и контрольная сумма. Сетевая карта читает MAC-адрес — если это её адрес, принимает кадр, иначе игнорирует.<br>
+<strong>Вход:</strong> поток битов <code>10011001...</code>. <strong>Выход:</strong> кадр <code>[преамбула][dst: AA:BB:CC:DD:EE:FF][src: 11:22:33:44:55:66][данные][CRC]</code>, доставленный конкретному устройству в локальной сети.</p></li>
+<li><p><strong>Добавляем маршрутизацию между сетями</strong> (L3 — сетевой). MAC-адреса работают только в пределах одного сегмента сети. Чтобы связать сети, оборачиваем данные в <strong>IP-пакет</strong>: заголовок содержит IP-адрес отправителя (<code>192.168.1.10</code>) и получателя (<code>93.184.216.34</code>). Маршрутизатор на границе сети читает IP-адрес назначения, находит следующий узел в таблице маршрутизации и пересылает пакет дальше — и так по цепочке до целевой сети.<br>
+<strong>Вход:</strong> кадр с данными. <strong>Выход:</strong> IP-пакет <code>[src: 192.168.1.10][dst: 93.184.216.34][данные]</code>, доставленный на нужный компьютер через произвольное количество промежуточных сетей.</p></li>
+<li><p><strong>Доставляем данные конкретной программе</strong> (L4 — транспортный). На одном компьютере работают десятки процессов: веб-сервер, база данных, почтовый клиент. IP доставил пакет на машину, но кому именно? Договариваемся о <strong>портах</strong> — числовых идентификаторах (0–65535). TCP добавляет к каждому сегменту порт отправителя и получателя (например, <code>:443</code>), а также порядковый номер, подтверждение доставки и контрольную сумму. Если сегмент потерялся — TCP замечает пропуск в номерах и запрашивает повторную отправку.<br>
+<strong>Вход:</strong> IP-пакет, доставленный на машину. <strong>Выход:</strong> TCP-сегмент <code>[src port: 51234][dst port: 443][seq: 1][ack: 1][данные]</code>, надёжно доставленный конкретному процессу.</p></li>
+<li><p><strong>Шифруем и форматируем</strong> (L5/L6 — сеансовый и представления). Данные доставляются, но в открытом виде — любой промежуточный узел может их прочитать. Договариваемся о TLS: клиент и сервер выполняют <strong>handshake</strong> (обмениваются сертификатами и ключами), после чего весь поток шифруется. Также на этом уровне фиксируется кодировка (UTF-8) и формат сериализации (JSON, XML, бинарный).<br>
+<strong>Вход:</strong> поток байтов <code>GET /users/42...</code> в открытом виде. <strong>Выход:</strong> зашифрованный поток <code>17 03 03 00 1A 8b 4e ...</code> — без ключа содержимое нечитаемо.</p></li>
+<li><p><strong>Определяем смысл сообщений</strong> (L7 — прикладной). Все нижние уровни обеспечивают доставку, но не определяют <strong>что означает</strong> переданное сообщение. На прикладном уровне фиксируем протокол — например, HTTP: клиент отправляет <code>GET /users/42 HTTP/1.1</code>, сервер отвечает <code>200 OK</code> с телом <code>{"id": 42, "name": "Alice"}</code>. Метод, путь, заголовки и код статуса — всё это договорённости прикладного протокола.</p></li>
+</ol>
+<p>Каждый уровень оборачивает данные в свой «конверт» (заголовок) при отправке — это <strong>инкапсуляция</strong>. На принимающей стороне каждый уровень снимает свой заголовок и передаёт содержимое выше — это <strong>декапсуляция</strong>.</p>
+</section>
+<section id="практическое-упрощение-tcpip" class="level3">
+<h3 class="anchored" data-anchor-id="практическое-упрощение-tcpip">Практическое упрощение: TCP/IP</h3>
+<p>На практике чаще используют четырёхуровневую модель TCP/IP, которая объединяет уровни OSI:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><strong>Уровень TCP/IP</strong></th>
+<th><strong>Задача</strong></th>
+<th><strong>Соответствие OSI</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Прикладной</td>
+<td>Протокол приложения (HTTP, DNS, …)</td>
+<td>L5–L7</td>
+</tr>
+<tr class="even">
+<td>Транспортный</td>
+<td>Доставка данных процессу (TCP/UDP)</td>
+<td>L4</td>
+</tr>
+<tr class="odd">
+<td>Сетевой</td>
+<td>Маршрутизация между сетями (IP)</td>
+<td>L3</td>
+</tr>
+<tr class="even">
+<td>Канальный</td>
+<td>Доставка в локальной сети</td>
+<td>L1–L2</td>
+</tr>
+</tbody>
+</table>
+<p>Для разработчика ключевые уровни — транспортный и прикладной. Именно здесь принимаются архитектурные решения: выбор между TCP и UDP, между HTTP/1.1 и HTTP/2, между текстовым и бинарным форматом сообщений.</p>
+</section>
+<section id="tcp-vs-udp-два-подхода-к-доставке" class="level3">
+<h3 class="anchored" data-anchor-id="tcp-vs-udp-два-подхода-к-доставке">TCP vs UDP: два подхода к доставке</h3>
+<p><strong>TCP (Transmission Control Protocol)</strong> — надёжный, упорядоченный, с контролем потока. Гарантирует доставку и порядок. Используется для HTTP, gRPC, баз данных — везде, где потеря данных недопустима.</p>
+<p><strong>UDP (User Datagram Protocol)</strong> — минимальный, без гарантий доставки и порядка. Используется для видеозвонков, онлайн-игр, DNS — там, где скорость важнее полноты.</p>
+<p>Выбор транспорта определяется требованиями прикладного протокола: HTTP <strong>требует</strong> TCP, а потоковое видео <strong>допускает</strong> потери и выбирает UDP.</p>
+</section>
+</section>
+<section id="http-прикладной-протокол-веба" class="level2">
+<h2 class="anchored" data-anchor-id="http-прикладной-протокол-веба">HTTP — прикладной протокол веба</h2>
+<p>TCP умеет надёжно доставлять поток байтов между двумя процессами. Но он ничего не знает о <strong>смысле</strong> этих байтов — для TCP строка <code>GET /users/42</code> и случайный набор символов одинаковы. Нужен следующий договор: как именно клиент формулирует запрос и как сервер отвечает.</p>
+<p>Этот договор — <strong>HTTP</strong> (HyperText Transfer Protocol). Он фиксирует текстовый формат сообщений поверх TCP-соединения.</p>
+<section id="структура-http-запроса" class="level3">
+<h3 class="anchored" data-anchor-id="структура-http-запроса">Структура HTTP-запроса</h3>
+<p>Клиент отправляет текстовое сообщение строго определённой структуры:</p>
+<pre><code>GET /users/42 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer eyJhbGciOi...</code></pre>
+<p>Компоненты запроса: - <strong>Стартовая строка:</strong> метод (<code>GET</code>), путь (<code>/users/42</code>), версия протокола (<code>HTTP/1.1</code>) - <strong>Заголовки:</strong> пары ключ-значение с метаинформацией — куда обращаемся (<code>Host</code>), какой формат ответа ожидаем (<code>Accept</code>), как авторизуемся (<code>Authorization</code>) - <strong>Пустая строка:</strong> разделитель между заголовками и телом - <strong>Тело</strong> (опционально): полезная нагрузка — например, JSON при создании ресурса</p>
+</section>
+<section id="структура-http-ответа" class="level3">
+<h3 class="anchored" data-anchor-id="структура-http-ответа">Структура HTTP-ответа</h3>
+<p>Сервер отвечает в аналогичном формате:</p>
+<pre><code>HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 42
+
+{"id": 42, "name": "Alice", "email": "alice@example.com"}</code></pre>
+<p>Компоненты ответа: - <strong>Статусная строка:</strong> версия протокола, код статуса (<code>200</code>), текстовое пояснение (<code>OK</code>) - <strong>Заголовки:</strong> тип содержимого (<code>Content-Type</code>), размер тела (<code>Content-Length</code>) - <strong>Тело:</strong> полезная нагрузка ответа</p>
+</section>
+<section id="http-методы" class="level3">
+<h3 class="anchored" data-anchor-id="http-методы">HTTP-методы</h3>
+<p>HTTP определяет <strong>методы</strong> — глаголы, описывающие намерение клиента:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><strong>Метод</strong></th>
+<th><strong>Семантика</strong></th>
+<th><strong>Тело запроса</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>GET</code></td>
+<td>Получить ресурс. Не изменяет состояние сервера.</td>
+<td>Нет</td>
+</tr>
+<tr class="even">
+<td><code>POST</code></td>
+<td>Создать новый ресурс или выполнить операцию.</td>
+<td>Да</td>
+</tr>
+<tr class="odd">
+<td><code>PUT</code></td>
+<td>Полностью заменить ресурс.</td>
+<td>Да</td>
+</tr>
+<tr class="even">
+<td><code>PATCH</code></td>
+<td>Частично обновить ресурс.</td>
+<td>Да</td>
+</tr>
+<tr class="odd">
+<td><code>DELETE</code></td>
+<td>Удалить ресурс.</td>
+<td>Обычно нет</td>
+</tr>
+</tbody>
+</table>
+<p>Методы — это именно <strong>договорённость о намерении</strong>. Технически через <code>GET</code> можно удалять данные, но это нарушает протокол и ломает кеширование, прокси и поведение браузера.</p>
+</section>
+<section id="коды-статуса" class="level3">
+<h3 class="anchored" data-anchor-id="коды-статуса">Коды статуса</h3>
+<p>Код статуса сообщает клиенту <strong>результат</strong> обработки запроса. Коды сгруппированы по сотням:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Диапазон</strong></th>
+<th><strong>Значение</strong></th>
+<th><strong>Примеры</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>1xx</code></td>
+<td>Информационный — запрос принят, обработка продолжается</td>
+<td><code>101 Switching Protocols</code></td>
+</tr>
+<tr class="even">
+<td><code>2xx</code></td>
+<td>Успех — запрос обработан корректно</td>
+<td><code>200 OK</code>, <code>201 Created</code>, <code>204 No Content</code></td>
+</tr>
+<tr class="odd">
+<td><code>3xx</code></td>
+<td>Перенаправление — ресурс доступен по другому адресу</td>
+<td><code>301 Moved Permanently</code>, <code>304 Not Modified</code></td>
+</tr>
+<tr class="even">
+<td><code>4xx</code></td>
+<td>Ошибка клиента — запрос некорректен</td>
+<td><code>400 Bad Request</code>, <code>401 Unauthorized</code>, <code>404 Not Found</code></td>
+</tr>
+<tr class="odd">
+<td><code>5xx</code></td>
+<td>Ошибка сервера — запрос корректен, но сервер не смог обработать</td>
+<td><code>500 Internal Server Error</code>, <code>503 Service Unavailable</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="от-http-к-rest" class="level3">
+<h3 class="anchored" data-anchor-id="от-http-к-rest">От HTTP к REST</h3>
+<p>HTTP сам по себе — это протокол передачи сообщений. Он не навязывает, как организовать API: можно сделать единственный эндпоинт <code>POST /api</code> и передавать всё в теле, а можно использовать десятки путей без какой-либо системы.</p>
+<p><strong>REST</strong> (Representational State Transfer) — это архитектурный стиль, который задаёт <strong>правила организации API поверх HTTP</strong>:</p>
+<ul>
+<li><strong>Ресурсы:</strong> каждая сущность (пользователь, заказ, товар) адресуется собственным URI: <code>/users/42</code>, <code>/orders/7</code>.</li>
+<li><strong>Методы = операции:</strong> HTTP-методы отражают действие над ресурсом — <code>GET /users/42</code> читает, <code>DELETE /users/42</code> удаляет.</li>
+<li><strong>Коды статуса = результат:</strong> <code>201 Created</code> при создании, <code>404 Not Found</code> если ресурс не существует, <code>409 Conflict</code> при конфликте.</li>
+<li><strong>Stateless:</strong> каждый запрос содержит всю информацию для обработки — сервер не хранит состояние между запросами.</li>
+</ul>
+<p>Пример CRUD-операций над ресурсом «пользователи»:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Операция</strong></th>
+<th><strong>Запрос</strong></th>
+<th><strong>Тело</strong></th>
+<th><strong>Ответ</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Список</td>
+<td><code>GET /users</code></td>
+<td>—</td>
+<td><code>200 OK</code> + массив JSON</td>
+</tr>
+<tr class="even">
+<td>Чтение</td>
+<td><code>GET /users/42</code></td>
+<td>—</td>
+<td><code>200 OK</code> + объект JSON</td>
+</tr>
+<tr class="odd">
+<td>Создание</td>
+<td><code>POST /users</code></td>
+<td><code>{"name": "Bob"}</code></td>
+<td><code>201 Created</code> + объект с <code>id</code></td>
+</tr>
+<tr class="even">
+<td>Обновление</td>
+<td><code>PUT /users/42</code></td>
+<td><code>{"name": "Bob2"}</code></td>
+<td><code>200 OK</code> + обновлённый объект</td>
+</tr>
+<tr class="odd">
+<td>Удаление</td>
+<td><code>DELETE /users/42</code></td>
+<td>—</td>
+<td><code>204 No Content</code></td>
+</tr>
+</tbody>
+</table>
+<p>REST — не стандарт и не спецификация, а набор принципов. Конкретный API может следовать им строго или частично. Именно поэтому существует потребность в <strong>формальных спецификациях</strong>, которые фиксируют контракт однозначно.</p>
+</section>
+</section>
+<section id="контракт-api-от-договорённости-к-спецификации" class="level2">
+<h2 class="anchored" data-anchor-id="контракт-api-от-договорённости-к-спецификации">Контракт API: от договорённости к спецификации</h2>
+<p>Протокол определяет <strong>как</strong> передаются данные. Но для взаимодействия двух сервисов этого недостаточно — нужен <strong>контракт</strong>: формальное описание того, <strong>какие операции доступны, какие данные они принимают и возвращают</strong>.</p>
+<p>Без контракта разработчики двух сервисов вынуждены договариваться устно или читать чужой код. Это не масштабируется: при десятках сервисов и нескольких командах устные договорённости ломаются.</p>
+<p>Поэтому существуют <strong>формальные спецификации API</strong> — машиночитаемые описания контрактов.</p>
+<section id="openapi-swagger-спецификация-rest-api" class="level3">
+<h3 class="anchored" data-anchor-id="openapi-swagger-спецификация-rest-api">OpenAPI (Swagger) — спецификация REST API</h3>
+<p>OpenAPI описывает REST API в формате YAML или JSON: эндпоинты, методы, параметры, тела запросов и ответов, коды ошибок.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">openapi</span><span class="kw">:</span><span class="at"> </span><span class="st">"3.0.3"</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">info</span><span class="kw">:</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">title</span><span class="kw">:</span><span class="at"> User Service</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="st">"1.0"</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">paths</span><span class="kw">:</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">/users/{id}</span><span class="kw">:</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">get</span><span class="kw">:</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">summary</span><span class="kw">:</span><span class="at"> Получить пользователя по ID</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">parameters</span><span class="kw">:</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> id</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">in</span><span class="kw">:</span><span class="at"> path</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">required</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">schema</span><span class="kw">:</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="fu">type</span><span class="kw">:</span><span class="at"> integer</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">responses</span><span class="kw">:</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">"200"</span><span class="kw">:</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">description</span><span class="kw">:</span><span class="at"> Пользователь найден</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">content</span><span class="kw">:</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="fu">application/json</span><span class="kw">:</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="at">              </span><span class="fu">schema</span><span class="kw">:</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="at">                </span><span class="fu">$ref</span><span class="kw">:</span><span class="at"> </span><span class="st">"#/components/schemas/User"</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">"404"</span><span class="kw">:</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">description</span><span class="kw">:</span><span class="at"> Пользователь не найден</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="fu">components</span><span class="kw">:</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">schemas</span><span class="kw">:</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">User</span><span class="kw">:</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">type</span><span class="kw">:</span><span class="at"> object</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">properties</span><span class="kw">:</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">id</span><span class="kw">:</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">type</span><span class="kw">:</span><span class="at"> integer</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">name</span><span class="kw">:</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">type</span><span class="kw">:</span><span class="at"> string</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">email</span><span class="kw">:</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">type</span><span class="kw">:</span><span class="at"> string</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">format</span><span class="kw">:</span><span class="at"> email</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Из OpenAPI-спецификации автоматически генерируются: документация (Swagger UI), клиентские SDK, серверные заглушки (stubs) и валидаторы запросов.</p>
+</section>
+<section id="protocol-buffers-спецификация-grpc" class="level3">
+<h3 class="anchored" data-anchor-id="protocol-buffers-спецификация-grpc">Protocol Buffers — спецификация gRPC</h3>
+<p>gRPC использует <code>.proto</code>-файлы для описания сервисов и сообщений. Формат строго типизирован и компилируется в код на целевом языке.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode proto code-with-copy"><code class="sourceCode protobuf"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>syntax <span class="op">=</span> <span class="st">"proto3"</span>;</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">service</span> UserService {</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">rpc</span> GetUser (GetUserRequest) <span class="kw">returns</span> (User);</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">rpc</span> ListUsers (ListUsersRequest) <span class="kw">returns</span> (stream User);</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="kw">message</span> GetUserRequest {</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int32</span> id <span class="op">=</span> <span class="dv">1</span>;</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="kw">message</span> ListUsersRequest {</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int32</span> page_size <span class="op">=</span> <span class="dv">1</span>;</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">string</span> page_token <span class="op">=</span> <span class="dv">2</span>;</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="kw">message</span> User {</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int32</span> id <span class="op">=</span> <span class="dv">1</span>;</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="dt">string</span> name <span class="op">=</span> <span class="dv">2</span>;</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="dt">string</span> email <span class="op">=</span> <span class="dv">3</span>;</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Из <code>.proto</code>-файла генерируются клиент и сервер — разработчику остаётся реализовать бизнес-логику. Контракт гарантирует совместимость: если поле добавлено корректно (новый номер), старые клиенты продолжат работать.</p>
+</section>
+<section id="graphql-sdl-спецификация-graphql-api" class="level3">
+<h3 class="anchored" data-anchor-id="graphql-sdl-спецификация-graphql-api">GraphQL SDL — спецификация GraphQL API</h3>
+<p>GraphQL описывает API через схему (Schema Definition Language), которая определяет типы данных и доступные запросы.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode graphql code-with-copy"><code class="sourceCode graphql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> User {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  id: <span class="dt">ID</span>!</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  name: <span class="dt">String</span>!</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  email: <span class="dt">String</span>!</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  posts: [Post!]!</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Post {</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  id: <span class="dt">ID</span>!</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  title: <span class="dt">String</span>!</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  content: <span class="dt">String</span>!</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Query {</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  user(id: <span class="dt">ID</span>!): User</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  users(limit: <span class="dt">Int</span> = <span class="dv">10</span>): [User!]!</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Схема является и документацией, и контрактом, и инструментом валидации: сервер отклонит запрос, который не соответствует схеме.</p>
+</section>
+<section id="общий-принцип-спецификация-единый-источник-правды" class="level3">
+<h3 class="anchored" data-anchor-id="общий-принцип-спецификация-единый-источник-правды">Общий принцип: спецификация = единый источник правды</h3>
+<p>Во всех трёх подходах формальная спецификация служит единым источником правды (single source of truth) для всех участников:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Свойство</strong></th>
+<th><strong>OpenAPI</strong></th>
+<th><strong>Proto (gRPC)</strong></th>
+<th><strong>GraphQL SDL</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Формат</td>
+<td>YAML / JSON</td>
+<td><code>.proto</code></td>
+<td>SDL (текст)</td>
+</tr>
+<tr class="even">
+<td>Типизация</td>
+<td>JSON Schema</td>
+<td>Строгая, бинарная</td>
+<td>Строгая, граф</td>
+</tr>
+<tr class="odd">
+<td>Кодогенерация</td>
+<td>Клиент, документация</td>
+<td>Клиент + сервер</td>
+<td>Клиент, валидация</td>
+</tr>
+<tr class="even">
+<td>Версионирование</td>
+<td>URL (<code>/v1</code>, <code>/v2</code>)</td>
+<td>Номера полей</td>
+<td>Эволюция схемы</td>
+</tr>
+<tr class="odd">
+<td>Транспорт</td>
+<td>HTTP/1.1+</td>
+<td>HTTP/2</td>
+<td>HTTP (обычно)</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="связь-уровней-osi-и-контрактов" class="level2">
+<h2 class="anchored" data-anchor-id="связь-уровней-osi-и-контрактов">Связь уровней OSI и контрактов</h2>
+<p>Спецификации API работают на прикладном уровне (L7), но опираются на весь стек:</p>
+<ul>
+<li><strong>L4 (TCP)</strong> обеспечивает надёжную доставку — без этого ни один API-вызов не завершится.</li>
+<li><strong>L6/L5 (TLS)</strong> обеспечивают шифрование — без этого контракт выполняется, но данные видны третьим лицам.</li>
+<li><strong>L7 (HTTP/HTTP2)</strong> задаёт правила обмена сообщениями — заголовки, методы, коды статуса.</li>
+<li><strong>Спецификация API</strong> (OpenAPI, proto, SDL) фиксирует <strong>бизнес-семантику</strong> поверх HTTP: какие операции существуют, что принимают и возвращают.</li>
+</ul>
+<p>Таким образом, каждый уровень — это свой договор, и прикладной контракт является верхним слоем этой пирамиды договорённостей.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Скопировано");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Скопировано");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

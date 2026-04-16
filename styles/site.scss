@@ -9,3 +9,29 @@ body {
 .quarto-title-block .quarto-title-banner {
   background: #f2f5f7;
 }
+
+.module-intro {
+  background: linear-gradient(135deg, #eef3fb 0%, #e4ecf6 100%);
+  border-left: 4px solid #3b6ea8;
+  border-radius: 6px;
+  padding: 1.8rem 2rem;
+  margin: 3rem 0 2rem 0;
+
+  h1, h2 {
+    text-align: center;
+    color: #2c4e77;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    border: none;
+    font-weight: 600;
+  }
+
+  p, ul {
+    color: #2c3e50;
+    margin-bottom: 0.6rem;
+  }
+
+  p:last-child, ul:last-child {
+    margin-bottom: 0;
+  }
+}
