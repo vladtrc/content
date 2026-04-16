@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Практика 5: Операционные компоненты + OLAP – prototype</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../../">
+<script src="../../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../../site_libs/bootstrap/bootstrap-4897d45d2f75ed4f519693be625836c5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Поиск не дал результатов",
+    "search-matching-documents-text": "Результаты поиска",
+    "search-copy-link-title": "Скопировать ссылку",
+    "search-hide-matches-text": "Скрыть дополнительные результаты",
+    "search-more-match-text": "дополнительный результат в этом документе",
+    "search-more-matches-text": "дополнительных результата(-ов) в этом документе",
+    "search-clear-button-title": "Очистить",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Отменить",
+    "search-submit-button-title": "Найти",
+    "search-label": "Поиск"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../../../styles/site.scss">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../../index.html">
+    <span class="navbar-title">prototype</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Поиск"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Переключить навигацию" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../courses/index.html"> 
+<span class="menu-text">Courses</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../posts/index.html"> 
+<span class="menu-text">Posts</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Содержание</h2>
+   
+  <ul>
+  <li><a href="#практика-5-операционные-компоненты-olap" id="toc-практика-5-операционные-компоненты-olap" class="nav-link active" data-scroll-target="#практика-5-операционные-компоненты-olap">Практика 5: Операционные компоненты + OLAP</a>
+  <ul class="collapse">
+  <li><a href="#предисловие" id="toc-предисловие" class="nav-link" data-scroll-target="#предисловие">Предисловие</a></li>
+  <li><a href="#задание" id="toc-задание" class="nav-link" data-scroll-target="#задание">Задание</a></li>
+  <li><a href="#пример" id="toc-пример" class="nav-link" data-scroll-target="#пример">Пример</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Другие форматы</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>Typst</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Практика 5: Операционные компоненты + OLAP</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="практика-5-операционные-компоненты-olap" class="level1">
+<h1>Практика 5: Операционные компоненты + OLAP</h1>
+<section id="предисловие" class="level2">
+<h2 class="anchored" data-anchor-id="предисловие">Предисловие</h2>
+<p>Написать работающий код — только половина задачи. Продакшн-система требует операционных компонентов: защита от перегрузки (rate limiting), распределение нагрузки (load balancing), безопасность (аутентификация/авторизация), наблюдаемость (метрики, логи, трейсы). Также большинство систем нуждаются в аналитике — а это требует отдельного OLAP-хранилища и ETL-пайплайнов.</p>
+</section>
+<section id="задание" class="level2">
+<h2 class="anchored" data-anchor-id="задание">Задание</h2>
+<p>Дополните вашу OLTP-систему из Практики 3 <strong>операционными компонентами</strong>:</p>
+<p><strong>Часть 1: Rate Limiting и Load Balancing</strong></p>
+<ol type="1">
+<li><strong>Rate Limiting:</strong>
+<ul>
+<li>Выберите алгоритм: Token Bucket, Sliding Window Log, Sliding Window Counter</li>
+<li>Определите лимиты: для авторизованных и неавторизованных пользователей</li>
+<li>Обоснуйте выбор</li>
+</ul></li>
+<li><strong>Load Balancing:</strong>
+<ul>
+<li>Предположим, у вас 3 инстанса приложения</li>
+<li>Выберите алгоритм: Round Robin, Least Connections, IP Hash, Consistent Hashing</li>
+<li>Обоснуйте выбор</li>
+</ul></li>
+</ol>
+<p><strong>Часть 2: Security</strong></p>
+<ol type="1">
+<li><strong>Аутентификация:</strong>
+<ul>
+<li>Выберите механизм: JWT, Session-based, OAuth 2.0</li>
+<li>Опишите flow (последовательность запросов)</li>
+</ul></li>
+<li><strong>Авторизация:</strong>
+<ul>
+<li>Выберите модель: RBAC, ABAC</li>
+<li>Определите роли/права для вашего сценария</li>
+</ul></li>
+</ol>
+<p><strong>Часть 3: Observability</strong></p>
+<ol type="1">
+<li><strong>Метрики (Prometheus):</strong>
+<ul>
+<li>Определите 5-7 ключевых метрик для мониторинга</li>
+<li>Укажите тип: Counter, Gauge, Histogram, Summary</li>
+<li>Напишите примеры PromQL-запросов</li>
+</ul></li>
+<li><strong>Логирование:</strong>
+<ul>
+<li>Определите формат: structured JSON</li>
+<li>Какие поля включать (timestamp, level, user_id, trace_id, etc.)</li>
+</ul></li>
+<li><strong>Трассировка:</strong>
+<ul>
+<li>Опишите span для типичного запроса (например, создание заказа)</li>
+</ul></li>
+</ol>
+<p><strong>Часть 4: OLAP и аналитика</strong></p>
+<ol type="1">
+<li><strong>Требования к аналитике:</strong>
+<ul>
+<li>Какие отчёты нужны? (например: топ-товары, динамика продаж, RFM-анализ клиентов)</li>
+</ul></li>
+<li><strong>ETL Pipeline:</strong>
+<ul>
+<li>Как передавать данные из OLTP (PostgreSQL) в OLAP (ClickHouse)?</li>
+<li>Выберите инструмент: Airflow, dbt, custom script</li>
+<li>Опишите schedule (real-time, hourly, daily?)</li>
+</ul></li>
+<li><strong>Расчёт объёма:</strong>
+<ul>
+<li>Сколько данных в день передаётся в OLAP?</li>
+<li>Формат: Parquet, CSV, JSON?</li>
+<li>Компрессия: gzip, zstd?</li>
+</ul></li>
+</ol>
+<p><strong>Формат ответа:</strong> документ с архитектурной схемой и обоснованиями.</p>
+</section>
+<section id="пример" class="level2">
+<h2 class="anchored" data-anchor-id="пример">Пример</h2>
+<p><strong>Часть 1: Rate Limiting и Load Balancing</strong></p>
+<p><strong>1. Rate Limiting</strong></p>
+<p><strong>Алгоритм: Token Bucket</strong></p>
+<p>Лимиты:</p>
+<pre><code>- Неавторизованные пользователи: 10 req/min (защита от парсеров)
+- Авторизованные пользователи: 100 req/min
+- API для мобильного приложения: 200 req/min
+- Админы: без лимита</code></pre>
+<p>Конфигурация (nginx):</p>
+<pre class="nginx"><code>http {
+    # Зона для rate limiting
+    limit_req_zone $binary_remote_addr zone=general:10m rate=10r/m;
+    limit_req_zone $user_id zone=authenticated:10m rate=100r/m;
+
+    server {
+        location /api/ {
+            # Неавторизованные
+            limit_req zone=general burst=20;
+
+            # Если есть токен — используем зону authenticated
+            if ($http_authorization) {
+                limit_req zone=authenticated burst=50;
+            }
+        }
+    }
+}</code></pre>
+<p><strong>Обоснование Token Bucket:</strong></p>
+<ul>
+<li>Позволяет burst (всплески): пользователь может сделать 20 быстрых запросов, потом ограничение</li>
+<li>Простая реализация в nginx/Redis</li>
+<li>Sliding Window Log был бы точнее, но избыточен</li>
+</ul>
+<p><strong>2. Load Balancing</strong></p>
+<p><strong>Алгоритм: Least Connections</strong></p>
+<p>Конфигурация (nginx):</p>
+<pre class="nginx"><code>upstream backend {
+    least_conn;  # выбирает сервер с наименьшим числом активных соединений
+
+    server app1.internal:3000;
+    server app2.internal:3000;
+    server app3.internal:3000;
+}
+
+server {
+    listen 80;
+    location / {
+        proxy_pass http://backend;
+    }
+}</code></pre>
+<p><strong>Обоснование:</strong></p>
+<ul>
+<li>Запросы неравномерные: создание заказа (долгий) vs просмотр товара (быстрый)</li>
+<li>Least Connections автоматически учитывает загруженность</li>
+<li>Round Robin не учитывает нагрузку — может перегрузить один сервер</li>
+<li>IP Hash не нужен (нет sticky sessions)</li>
+</ul>
+<p><strong>Часть 2: Security</strong></p>
+<p><strong>1. Аутентификация: JWT</strong></p>
+<p><strong>Flow:</strong></p>
+<pre><code>1. POST /auth/login {email, password}
+   → Сервер проверяет пароль
+   → Возвращает JWT: {user_id, roles, exp}
+
+2. Клиент сохраняет JWT (localStorage/cookie)
+
+3. Все последующие запросы:
+   GET /api/cart
+   Authorization: Bearer &lt;JWT&gt;
+
+4. Сервер проверяет подпись JWT (без обращения к БД!)</code></pre>
+<p>JWT structure:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"header"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"alg"</span><span class="fu">:</span> <span class="st">"HS256"</span><span class="fu">,</span> <span class="dt">"typ"</span><span class="fu">:</span> <span class="st">"JWT"</span><span class="fu">},</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"payload"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"user_id"</span><span class="fu">:</span> <span class="dv">12345</span><span class="fu">,</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"email"</span><span class="fu">:</span> <span class="st">"alice@example.com"</span><span class="fu">,</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"roles"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"customer"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"exp"</span><span class="fu">:</span> <span class="dv">1704067200</span>  <span class="er">//</span> <span class="er">срок</span> <span class="er">действия:</span> <span class="dv">1</span> <span class="er">час</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"signature"</span><span class="fu">:</span> <span class="st">"..."</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Обоснование:</strong></p>
+<ul>
+<li>Stateless: не нужно хранить сессии в Redis/БД</li>
+<li>Масштабируемость: любой инстанс может проверить JWT</li>
+<li>Session-based требует централизованное хранилище (Redis)</li>
+</ul>
+<p><strong>2. Авторизация: RBAC</strong></p>
+<p><strong>Роли:</strong></p>
+<pre><code>- customer: может просматривать товары, управлять корзиной, создавать заказы
+- admin: может управлять товарами, просматривать все заказы
+- support: может просматривать заказы, менять статусы</code></pre>
+<p><strong>Права (permissions):</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode go code-with-copy"><code class="sourceCode go"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> <span class="op">(</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    ReadProducts    <span class="op">=</span> <span class="st">"products:read"</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    WriteProducts   <span class="op">=</span> <span class="st">"products:write"</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    ReadOrders      <span class="op">=</span> <span class="st">"orders:read"</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    WriteOrders     <span class="op">=</span> <span class="st">"orders:write"</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    ReadAllOrders   <span class="op">=</span> <span class="st">"orders:read:all"</span>  <span class="co">// свои vs все</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    UpdateOrderStatus <span class="op">=</span> <span class="st">"orders:update:status"</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> roles <span class="op">=</span> <span class="kw">map</span><span class="op">[</span><span class="dt">string</span><span class="op">][]</span><span class="dt">string</span><span class="op">{</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"customer"</span><span class="op">:</span> <span class="op">{</span>ReadProducts<span class="op">,</span> WriteOrders<span class="op">,</span> ReadOrders<span class="op">},</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"admin"</span><span class="op">:</span>    <span class="op">{</span>ReadProducts<span class="op">,</span> WriteProducts<span class="op">,</span> ReadAllOrders<span class="op">,</span> UpdateOrderStatus<span class="op">},</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"support"</span><span class="op">:</span>  <span class="op">{</span>ReadProducts<span class="op">,</span> ReadAllOrders<span class="op">,</span> UpdateOrderStatus<span class="op">},</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Middleware для проверки:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode go code-with-copy"><code class="sourceCode go"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> RequirePermission<span class="op">(</span>perm <span class="dt">string</span><span class="op">)</span> middleware <span class="op">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">func</span><span class="op">(</span>c <span class="op">*</span>Context<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        userRoles <span class="op">:=</span> c<span class="op">.</span>Get<span class="op">(</span><span class="st">"roles"</span><span class="op">)</span>  <span class="co">// из JWT</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">!</span>hasPermission<span class="op">(</span>userRoles<span class="op">,</span> perm<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>            c<span class="op">.</span>AbortWithStatus<span class="op">(</span><span class="dv">403</span><span class="op">)</span>  <span class="co">// Forbidden</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">// Использование</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>router<span class="op">.</span>POST<span class="op">(</span><span class="st">"/products"</span><span class="op">,</span> RequirePermission<span class="op">(</span>WriteProducts<span class="op">),</span> createProduct<span class="op">)</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>router<span class="op">.</span>GET<span class="op">(</span><span class="st">"/orders"</span><span class="op">,</span> RequirePermission<span class="op">(</span>ReadAllOrders<span class="op">),</span> listAllOrders<span class="op">)</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Обоснование RBAC:</strong></p>
+<ul>
+<li>Простая модель для типичного e-commerce</li>
+<li>Роли статичны (customer, admin)</li>
+<li>ABAC избыточен (не нужны динамические правила вроде “только в рабочее время”)</li>
+</ul>
+<p><strong>Часть 3: Observability</strong></p>
+<p><strong>1. Метрики (Prometheus)</strong></p>
+<p><strong>Ключевые метрики:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode go code-with-copy"><code class="sourceCode go"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="st">"github.com/prometheus/client_golang/prometheus"</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">// 1. Counter: общее количество запросов</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> httpRequestsTotal <span class="op">=</span> prometheus<span class="op">.</span>NewCounterVec<span class="op">(</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    prometheus<span class="op">.</span>CounterOpts<span class="op">{</span>Name<span class="op">:</span> <span class="st">"http_requests_total"</span><span class="op">},</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">[]</span><span class="dt">string</span><span class="op">{</span><span class="st">"method"</span><span class="op">,</span> <span class="st">"endpoint"</span><span class="op">,</span> <span class="st">"status"</span><span class="op">},</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">// 2. Histogram: латентность запросов</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> httpDuration <span class="op">=</span> prometheus<span class="op">.</span>NewHistogramVec<span class="op">(</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    prometheus<span class="op">.</span>HistogramOpts<span class="op">{</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>        Name<span class="op">:</span> <span class="st">"http_request_duration_seconds"</span><span class="op">,</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        Buckets<span class="op">:</span> <span class="op">[]</span><span class="dt">float64</span><span class="op">{</span><span class="fl">.001</span><span class="op">,</span> <span class="fl">.01</span><span class="op">,</span> <span class="fl">.1</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">10</span><span class="op">},</span>  <span class="co">// 1ms, 10ms, 100ms, 1s, 10s</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">[]</span><span class="dt">string</span><span class="op">{</span><span class="st">"method"</span><span class="op">,</span> <span class="st">"endpoint"</span><span class="op">},</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co">// 3. Gauge: активные соединения</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> activeConnections <span class="op">=</span> prometheus<span class="op">.</span>NewGauge<span class="op">(</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    prometheus<span class="op">.</span>GaugeOpts<span class="op">{</span>Name<span class="op">:</span> <span class="st">"http_active_connections"</span><span class="op">},</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co">// 4. Counter: заказы</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> ordersCreated <span class="op">=</span> prometheus<span class="op">.</span>NewCounter<span class="op">(</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    prometheus<span class="op">.</span>CounterOpts<span class="op">{</span>Name<span class="op">:</span> <span class="st">"orders_created_total"</span><span class="op">},</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="co">// 5. Counter: ошибки БД</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> dbErrors <span class="op">=</span> prometheus<span class="op">.</span>NewCounterVec<span class="op">(</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>    prometheus<span class="op">.</span>CounterOpts<span class="op">{</span>Name<span class="op">:</span> <span class="st">"db_errors_total"</span><span class="op">},</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>    <span class="op">[]</span><span class="dt">string</span><span class="op">{</span><span class="st">"operation"</span><span class="op">},</span>  <span class="co">// select, insert, update</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="co">// 6. Histogram: размер корзины</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> cartSize <span class="op">=</span> prometheus<span class="op">.</span>NewHistogram<span class="op">(</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>    prometheus<span class="op">.</span>HistogramOpts<span class="op">{</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>        Name<span class="op">:</span> <span class="st">"cart_items_count"</span><span class="op">,</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>        Buckets<span class="op">:</span> <span class="op">[]</span><span class="dt">float64</span><span class="op">{</span><span class="dv">1</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">5</span><span class="op">,</span> <span class="dv">10</span><span class="op">,</span> <span class="dv">20</span><span class="op">},</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a><span class="co">// 7. Gauge: остаток товаров на складе</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> productStock <span class="op">=</span> prometheus<span class="op">.</span>NewGaugeVec<span class="op">(</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    prometheus<span class="op">.</span>GaugeOpts<span class="op">{</span>Name<span class="op">:</span> <span class="st">"product_stock"</span><span class="op">},</span></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>    <span class="op">[]</span><span class="dt">string</span><span class="op">{</span><span class="st">"product_id"</span><span class="op">},</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>PromQL запросы:</strong></p>
+<pre class="promql"><code># 1. RPS (запросов в секунду)
+rate(http_requests_total[1m])
+
+# 2. Error rate (процент 5xx ошибок)
+sum(rate(http_requests_total{status=~"5.."}[1m]))
+/
+sum(rate(http_requests_total[1m]))
+
+# 3. p95 латентность
+histogram_quantile(0.95,
+  rate(http_request_duration_seconds_bucket[5m])
+)
+
+# 4. Количество заказов за последний час
+increase(orders_created_total[1h])
+
+# 5. Топ медленных эндпоинтов
+topk(5,
+  histogram_quantile(0.99,
+    rate(http_request_duration_seconds_bucket[5m])
+  ) by (endpoint)
+)</code></pre>
+<p><strong>Grafana дашборд (панели):</strong></p>
+<ul>
+<li>RPS по эндпоинтам (линейный график)</li>
+<li>Error rate (линейный график с алертом &gt; 1%)</li>
+<li>Латентность p50/p95/p99 (линейный график)</li>
+<li>Активные соединения (gauge)</li>
+<li>Количество заказов за день (counter)</li>
+</ul>
+<p><strong>2. Логирование</strong></p>
+<p><strong>Формат: Structured JSON</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"timestamp"</span><span class="fu">:</span> <span class="st">"2025-01-02T14:30:15.123Z"</span><span class="fu">,</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"level"</span><span class="fu">:</span> <span class="st">"INFO"</span><span class="fu">,</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"service"</span><span class="fu">:</span> <span class="st">"ecommerce-api"</span><span class="fu">,</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"trace_id"</span><span class="fu">:</span> <span class="st">"a1b2c3d4-e5f6-7890"</span><span class="fu">,</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"span_id"</span><span class="fu">:</span> <span class="st">"f1e2d3c4"</span><span class="fu">,</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"user_id"</span><span class="fu">:</span> <span class="dv">12345</span><span class="fu">,</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"method"</span><span class="fu">:</span> <span class="st">"POST"</span><span class="fu">,</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"endpoint"</span><span class="fu">:</span> <span class="st">"/api/orders"</span><span class="fu">,</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"status"</span><span class="fu">:</span> <span class="dv">201</span><span class="fu">,</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"duration_ms"</span><span class="fu">:</span> <span class="dv">45</span><span class="fu">,</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"message"</span><span class="fu">:</span> <span class="st">"Order created successfully"</span><span class="fu">,</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"order_id"</span><span class="fu">:</span> <span class="dv">98765</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Пример ошибки:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"timestamp"</span><span class="fu">:</span> <span class="st">"2025-01-02T14:32:10.456Z"</span><span class="fu">,</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"level"</span><span class="fu">:</span> <span class="st">"ERROR"</span><span class="fu">,</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"service"</span><span class="fu">:</span> <span class="st">"ecommerce-api"</span><span class="fu">,</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"trace_id"</span><span class="fu">:</span> <span class="st">"a1b2c3d4-e5f6-7890"</span><span class="fu">,</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"span_id"</span><span class="fu">:</span> <span class="st">"f1e2d3c4"</span><span class="fu">,</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"user_id"</span><span class="fu">:</span> <span class="dv">12345</span><span class="fu">,</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"method"</span><span class="fu">:</span> <span class="st">"POST"</span><span class="fu">,</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"endpoint"</span><span class="fu">:</span> <span class="st">"/api/orders"</span><span class="fu">,</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"error"</span><span class="fu">:</span> <span class="st">"insufficient stock"</span><span class="fu">,</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"product_id"</span><span class="fu">:</span> <span class="dv">555</span><span class="fu">,</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"requested"</span><span class="fu">:</span> <span class="dv">10</span><span class="fu">,</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"available"</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"message"</span><span class="fu">:</span> <span class="st">"Failed to create order"</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Преимущества:</strong></p>
+<ul>
+<li>Легко фильтровать по полям (Elasticsearch, Loki)</li>
+<li>Trace_id связывает логи одного запроса</li>
+<li>Можно парсить и строить метрики</li>
+</ul>
+<p><strong>3. Distributed Tracing (OpenTelemetry + Jaeger)</strong></p>
+<p><strong>Span для создания заказа:</strong></p>
+<pre><code>Trace: "POST /api/orders" (trace_id: abc-def)
+├─ Span 1: "http.request" (45 мс total)
+│  ├─ Span 2: "validate_cart" (2 мс)
+│  │  └─ Span 3: "redis.get cart:12345" (0.5 мс)
+│  ├─ Span 4: "db.transaction.create_order" (40 мс)
+│  │  ├─ Span 5: "db.insert orders" (10 мс)
+│  │  ├─ Span 6: "db.insert order_items" (5 мс)
+│  │  └─ Span 7: "db.update products.stock" (15 мс)  ← медленный!
+│  └─ Span 8: "send_email_notification" (3 мс async)</code></pre>
+<p><strong>Вывод из трейса:</strong> обновление stock занимает 15 мс (самая медленная операция). Возможная оптимизация: батчинг UPDATE или использовать Redis для быстрой проверки остатков.</p>
+<p><strong>Часть 4: OLAP и аналитика</strong></p>
+<p><strong>1. Требования к аналитике</strong></p>
+<p>Отчёты для бизнеса:</p>
+<ul>
+<li><strong>Топ-товары</strong> (самые продаваемые за день/неделю/месяц)</li>
+<li><strong>Динамика продаж</strong> (revenue по дням, сравнение с прошлым периодом)</li>
+<li><strong>RFM-анализ клиентов</strong> (Recency, Frequency, Monetary — сегментация)</li>
+<li><strong>Конверсия корзины</strong> (% пользователей, совершивших заказ)</li>
+<li><strong>AOV</strong> (Average Order Value — средний чек)</li>
+</ul>
+<p><strong>2. ETL Pipeline (Airflow)</strong></p>
+<p><strong>Архитектура:</strong></p>
+<pre><code>PostgreSQL (OLTP)
+    ↓ (каждый час)
+Airflow DAG: extract → transform → load
+    ↓
+ClickHouse (OLAP)</code></pre>
+<p><strong>Airflow DAG:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> airflow <span class="im">import</span> DAG</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> airflow.operators.python <span class="im">import</span> PythonOperator</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime, timedelta</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>dag <span class="op">=</span> DAG(</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'oltp_to_olap_etl'</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    start_date<span class="op">=</span>datetime(<span class="dv">2025</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    schedule_interval<span class="op">=</span><span class="st">'@hourly'</span>,  <span class="co"># каждый час</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_orders():</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Читаем новые заказы из PostgreSQL</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    conn <span class="op">=</span> psycopg2.<span class="ex">connect</span>(<span class="st">"postgresql://..."</span>)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.read_sql(<span class="st">"""</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="st">        SELECT o.id, o.user_id, o.created_at, o.total_amount,</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="st">               oi.product_id, oi.quantity, oi.price</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="st">        FROM orders o</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="st">        JOIN order_items oi ON oi.order_id = o.id</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="st">        WHERE o.created_at &gt;= NOW() - INTERVAL '1 hour'</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span>, conn)</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    df.to_parquet(<span class="st">'/tmp/orders_hourly.parquet'</span>)</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> transform_data():</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.read_parquet(<span class="st">'/tmp/orders_hourly.parquet'</span>)</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Добавляем метаданные</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'extracted_at'</span>] <span class="op">=</span> datetime.now()</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>    df.to_parquet(<span class="st">'/tmp/orders_transformed.parquet'</span>)</span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_to_clickhouse():</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.read_parquet(<span class="st">'/tmp/orders_transformed.parquet'</span>)</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Загружаем в ClickHouse</span></span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>    client <span class="op">=</span> clickhouse_connect.get_client(host<span class="op">=</span><span class="st">'clickhouse.internal'</span>)</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>    client.insert_df(<span class="st">'orders_fact'</span>, df)</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>extract_task <span class="op">=</span> PythonOperator(task_id<span class="op">=</span><span class="st">'extract'</span>, python_callable<span class="op">=</span>extract_orders, dag<span class="op">=</span>dag)</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>transform_task <span class="op">=</span> PythonOperator(task_id<span class="op">=</span><span class="st">'transform'</span>, python_callable<span class="op">=</span>transform_data, dag<span class="op">=</span>dag)</span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>load_task <span class="op">=</span> PythonOperator(task_id<span class="op">=</span><span class="st">'load'</span>, python_callable<span class="op">=</span>load_to_clickhouse, dag<span class="op">=</span>dag)</span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>extract_task <span class="op">&gt;&gt;</span> transform_task <span class="op">&gt;&gt;</span> load_task</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Schedule:</strong></p>
+<ul>
+<li><strong>Hourly</strong> для оперативных дашбордов (динамика продаж в реальном времени)</li>
+<li><strong>Daily</strong> для тяжёлых агрегаций (RFM-анализ)</li>
+</ul>
+<p><strong>3. Расчёт объёма</strong></p>
+<p>Данные в день:</p>
+<pre><code>10,000 заказов/день × 2 товара/заказ = 20,000 строк
+Размер строки: ~100 байт (order_id, user_id, product_id, quantity, price, timestamps)
+20,000 × 100 байт = 2 МБ/день</code></pre>
+<p>Формат: <strong>Parquet</strong></p>
+<ul>
+<li>Колоночный формат (оптимален для ClickHouse)</li>
+<li>Встроенная компрессия (zstd)</li>
+<li>Эффективно для батчинга (hourly loads)</li>
+</ul>
+<p>Компрессия:</p>
+<pre><code>2 МБ (raw) → ~0.5 МБ (Parquet + zstd)</code></pre>
+<p>Объём за год:</p>
+<pre><code>0.5 МБ/день × 365 = 182 МБ/год</code></pre>
+<p>ClickHouse схема:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> orders_fact (</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    order_id UInt64,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    user_id UInt64,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    product_id UInt64,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    quantity UInt16,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    price <span class="dt">Decimal</span>(<span class="dv">10</span>, <span class="dv">2</span>),</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    created_at DateTime,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    extracted_at DateTime</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>ENGINE <span class="op">=</span> MergeTree()</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="kw">PARTITION</span> <span class="kw">BY</span> toYYYYMM(created_at)  <span class="co">-- партиционирование по месяцам</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> (user_id, created_at);  <span class="co">-- сортировка для быстрых запросов по user_id</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Пример запроса (топ-товары):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    product_id,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">SUM</span>(quantity) <span class="kw">AS</span> total_sold,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">SUM</span>(quantity <span class="op">*</span> price) <span class="kw">AS</span> revenue</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> orders_fact</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> created_at <span class="op">&gt;=</span> today() <span class="op">-</span> <span class="dt">INTERVAL</span> <span class="dv">7</span> <span class="dt">DAY</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> product_id</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> revenue <span class="kw">DESC</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Итого:</strong></p>
+<ul>
+<li>OLTP → OLAP: hourly через Airflow</li>
+<li>Формат: Parquet (колоночный + компрессия)</li>
+<li>Объём: ~0.5 МБ/день → 182 МБ/год (легко масштабируется)</li>
+</ul>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Скопировано");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Скопировано");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

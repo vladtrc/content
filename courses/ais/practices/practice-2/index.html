@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>prototype</title>
+<title>Практика 2: Реализация спроектированного приложения – prototype</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -26,23 +26,23 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-4897d45d2f75ed4f519693be625836c5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../../">
+<script src="../../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../../site_libs/bootstrap/bootstrap-4897d45d2f75ed4f519693be625836c5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -72,7 +72,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="styles/site.scss">
+<link rel="stylesheet" href="../../../../styles/site.scss">
 </head>
 
 <body class="nav-fixed quarto-light">
@@ -82,7 +82,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../../../index.html">
     <span class="navbar-title">prototype</span>
     </a>
   </div>
@@ -93,15 +93,15 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link" href="../../../../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./courses/index.html"> 
+    <a class="nav-link" href="../../../../courses/index.html"> 
 <span class="menu-text">Courses</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./posts/index.html"> 
+    <a class="nav-link" href="../../../../posts/index.html"> 
 <span class="menu-text">Posts</span></a>
   </li>  
 </ul>
@@ -115,15 +115,26 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Содержание</h2>
+   
+  <ul>
+  <li><a href="#практика-2-реализация-спроектированного-приложения" id="toc-практика-2-реализация-спроектированного-приложения" class="nav-link active" data-scroll-target="#практика-2-реализация-спроектированного-приложения">Практика 2: Реализация спроектированного приложения</a>
+  <ul class="collapse">
+  <li><a href="#предисловие" id="toc-предисловие" class="nav-link" data-scroll-target="#предисловие">Предисловие</a></li>
+  <li><a href="#задание" id="toc-задание" class="nav-link" data-scroll-target="#задание">Задание</a></li>
+  <li><a href="#структура-отчёта" id="toc-структура-отчёта" class="nav-link" data-scroll-target="#структура-отчёта">Структура отчёта</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Другие форматы</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>Typst</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">prototype</h1>
+<h1 class="title">Практика 2: Реализация спроектированного приложения</h1>
 </div>
 
 
@@ -140,12 +151,175 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="практика-2-реализация-спроектированного-приложения" class="level1">
+<h1>Практика 2: Реализация спроектированного приложения</h1>
+<section id="предисловие" class="level2">
+<h2 class="anchored" data-anchor-id="предисловие">Предисловие</h2>
+<p>Во второй части реализуется проект из Практики 1. Главная цель — превратить архитектурную схему в работающий код и убедиться, что <strong>маппинг между рисунком и кодом</strong> прослеживается явно: каждый блок на схеме соответствует конкретному пакету/модулю, каждая стрелка — конкретному <code>import</code>/<code>require</code>/<code>using</code>.</p>
+<p><strong>Подключение базы данных.</strong> Вы можете подключить PostgreSQL, SQLite или любую другую СУБД — но это <strong>не обязательно</strong>. In-memory реализации (<code>map</code>/<code>slice</code>/<code>dict</code>) достаточно. Смысл практики не в настройке БД, а в том, чтобы зависимости в коде соответствовали зависимостям на схеме. Если ваша архитектура спроектирована правильно, замена in-memory репозитория на PostgreSQL потребует изменения ровно одного файла — реализации интерфейса.</p>
+<p><strong>На что будем смотреть в первую очередь:</strong></p>
 <ul>
-<li><a href="./courses/ais/index.html">Курс: Архитектура информационных систем</a></li>
-<li><a href="./posts/index.html">contextrot</a></li>
+<li>Какой компонент от чего зависит (import’ы, конструкторы, DI-конфигурация).</li>
+<li>Совпадает ли направление зависимостей в коде с направлением стрелок на схеме из Практики 1.</li>
+<li>Зависит ли use case от интерфейса репозитория, а не от конкретной реализации.</li>
+<li>Нет ли “коротких путей” (handler напрямую обращается к хранилищу, минуя use case).</li>
+</ul>
+</section>
+<section id="задание" class="level2">
+<h2 class="anchored" data-anchor-id="задание">Задание</h2>
+<ol type="1">
+<li><strong>Реализуйте слои из вашего проекта:</strong> domain, use cases, adapters, infrastructure.</li>
+<li><strong>Хранение данных:</strong> in-memory (<code>map</code>/<code>slice</code>/<code>dict</code>) или реальная СУБД — на ваш выбор. Если выбрали СУБД, убедитесь, что use cases зависят от интерфейса репозитория, а не от конкретной реализации (ORM, SQL-драйвер и т.д.).</li>
+<li><strong>Проверка endpoint’ов:</strong>
+<ul>
+<li>Каждый endpoint должен быть проверен через <strong>Insomnia или Postman</strong> (не Swagger UI). В отчёт — скриншоты запросов и ответов.</li>
+<li>Для endpoint’ов, которые <strong>изменяют состояние</strong> (создание, обновление, удаление): проверьте успешный сценарий + сценарий с логической ошибкой (например, попытка оформить заказ при пустой корзине).</li>
+<li>Для endpoint’ов, которые <strong>только читают данные</strong> (получение списка, получение по ID): достаточно успешного сценария.</li>
+<li>Сценарии “ошибка авторизации” не требуются.</li>
+</ul></li>
+<li><strong>Интеграционные тесты (необязательно, но приветствуются):</strong>
+<ul>
+<li>Если пишете тесты — минимум один тест на полный воркфлоу из нескольких шагов.</li>
+<li>Наличие интеграционных тестов учитывается как плюс при оценке.</li>
+</ul></li>
+<li><strong>Подготовьте отчёт</strong> (структура ниже).</li>
+</ol>
+<p><strong>Язык:</strong> Go, Java, C#, TypeScript или Elixir/Phoenix.</p>
+<p><strong>Структура проекта:</strong> можно выбрать свою. Ниже только ориентир, а не жёсткий шаблон. Важно лишь, чтобы проект не сводился к одному файлу: должно быть хотя бы несколько файлов или модулей с понятным разделением ответственности.</p>
+<pre><code>app/
+├── domain/
+├── usecases/
+├── adapters/
+├── repositories/in_memory/   # или repositories/postgres/
+├── infrastructure/
+└── main.*</code></pre>
+</section>
+<section id="структура-отчёта" class="level2">
+<h2 class="anchored" data-anchor-id="структура-отчёта">Структура отчёта</h2>
+<ol type="1">
+<li><p><strong>Введение.</strong> Краткое описание продукта и воркфлоу (из Практики 1). Если что-то изменилось — укажите что и почему.</p></li>
+<li><p><strong>Схема архитектуры.</strong> Обновлённая схема из Практики 1 (если менялась). На схеме выделены слои, компоненты, интерфейсы и направление зависимостей.</p></li>
+<li><p><strong>Маппинг «схема → код».</strong> Таблица, связывающая каждый блок на схеме с конкретным файлом/пакетом в проекте:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Слой</th>
+<th>Компонент на схеме</th>
+<th>Файл / пакет</th>
+<th>Зависит от (import’ы)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Domain</td>
+<td>Order</td>
+<td><code>domain/order.go</code></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>Use Cases</td>
+<td>CreateOrderUC</td>
+<td><code>usecases/create_order.go</code></td>
+<td><code>domain</code>, <code>ports.OrderRepo</code></td>
+</tr>
+<tr class="odd">
+<td>Ports</td>
+<td>OrderRepo (интерфейс)</td>
+<td><code>ports/order_repo.go</code></td>
+<td><code>domain</code></td>
+</tr>
+<tr class="even">
+<td>Adapters</td>
+<td>OrderHandler</td>
+<td><code>adapters/http/order.go</code></td>
+<td><code>usecases</code></td>
+</tr>
+<tr class="odd">
+<td>Infrastructure</td>
+<td>InMemoryOrderRepo</td>
+<td><code>repositories/memory/order.go</code></td>
+<td><code>domain</code>, <code>ports</code></td>
+</tr>
+</tbody>
+</table>
+<p>Для каждой строки важно показать, что зависимости направлены <strong>внутрь</strong> (к domain), а не наружу.</p></li>
+<li><p><strong>Таблица слоёв.</strong> Сводная таблица с количественными характеристиками:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 27%">
+<col style="width: 27%">
+<col style="width: 45%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Слой</th>
+<th>Ответственность</th>
+<th style="text-align: center;">LOC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Domain</td>
+<td>Сущности, value objects, бизнес-правила</td>
+<td style="text-align: center;">~120</td>
+</tr>
+<tr class="even">
+<td>Use Cases</td>
+<td>Сценарии, оркестрация, бизнес-логика</td>
+<td style="text-align: center;">~200</td>
+</tr>
+<tr class="odd">
+<td>Ports</td>
+<td>Интерфейсы репозиториев и внешних сервисов</td>
+<td style="text-align: center;">~40</td>
+</tr>
+<tr class="even">
+<td>Adapters</td>
+<td>HTTP-обработчики, маршрутизация, DTO</td>
+<td style="text-align: center;">~150</td>
+</tr>
+<tr class="odd">
+<td>Infrastructure</td>
+<td>Реализации репозиториев, DI-конфигурация, <code>main</code></td>
+<td style="text-align: center;">~100</td>
+</tr>
+</tbody>
+</table></li>
+<li><p><strong>Проверка endpoint’ов.</strong> Для каждого endpoint — скриншот из Insomnia/Postman: запрос и ответ. Для мутирующих endpoint’ов — дополнительно скриншот сценария с ошибкой. Если написаны интеграционные тесты — опишите сценарии и как их запустить.</p></li>
+<li><p><strong>Рефлексия.</strong> Что изменилось по сравнению с проектом из Практики 1 и почему. Примеры вопросов для рефлексии:</p>
+<ul>
+<li>Появились ли новые компоненты, которых не было на схеме?</li>
+<li>Пришлось ли менять API-контракты?</li>
+<li>Какие архитектурные решения оказались удачными, какие — нет?</li>
+</ul></li>
+</ol>
+<p><strong>Что сдаётся:</strong></p>
+<ol type="1">
+<li>Работающее приложение по проекту из Практики 1.</li>
+<li>Реализации всех репозиториев (in-memory или СУБД).</li>
+<li>Скриншоты проверки каждого endpoint’а в Insomnia/Postman.</li>
+<li>Интеграционные тесты (опционально).</li>
+<li>Отчёт по структуре выше.</li>
+</ol>
+<p><strong>Теория к сдаче:</strong></p>
+<p>Вся теория из Практики 1, плюс вопросы по собственному коду:</p>
+<ul>
+<li>Покажите на своём коде: где domain, где use cases, где adapters? Покажите направление зависимостей</li>
+<li>Что такое инверсия зависимостей? Покажите: use case зависит от интерфейса, а не от конкретной реализации репозитория</li>
+<li>Если завтра нужно заменить in-memory хранилище на PostgreSQL — какие файлы меняются, какие нет? Почему?</li>
+<li>Что такое прокси-компонент? Есть ли в вашем приложении непродуктивные слои?</li>
+<li>Почему вы выбрали именно этот протокол? В каком случае выбрали бы другой?</li>
 </ul>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

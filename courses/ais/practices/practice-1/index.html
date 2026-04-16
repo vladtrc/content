@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Практика 1: Проектирование API и взаимодействия – prototype</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../../">
+<script src="../../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../../site_libs/bootstrap/bootstrap-4897d45d2f75ed4f519693be625836c5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Поиск не дал результатов",
+    "search-matching-documents-text": "Результаты поиска",
+    "search-copy-link-title": "Скопировать ссылку",
+    "search-hide-matches-text": "Скрыть дополнительные результаты",
+    "search-more-match-text": "дополнительный результат в этом документе",
+    "search-more-matches-text": "дополнительных результата(-ов) в этом документе",
+    "search-clear-button-title": "Очистить",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Отменить",
+    "search-submit-button-title": "Найти",
+    "search-label": "Поиск"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../../../styles/site.scss">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../../index.html">
+    <span class="navbar-title">prototype</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Поиск"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Переключить навигацию" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../courses/index.html"> 
+<span class="menu-text">Courses</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../posts/index.html"> 
+<span class="menu-text">Posts</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Содержание</h2>
+   
+  <ul>
+  <li><a href="#практика-1-проектирование-api-и-взаимодействия" id="toc-практика-1-проектирование-api-и-взаимодействия" class="nav-link active" data-scroll-target="#практика-1-проектирование-api-и-взаимодействия">Практика 1: Проектирование API и взаимодействия</a>
+  <ul class="collapse">
+  <li><a href="#предисловие" id="toc-предисловие" class="nav-link" data-scroll-target="#предисловие">Предисловие</a></li>
+  <li><a href="#задание" id="toc-задание" class="nav-link" data-scroll-target="#задание">Задание</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Другие форматы</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>Typst</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Практика 1: Проектирование API и взаимодействия</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="практика-1-проектирование-api-и-взаимодействия" class="level1">
+<h1>Практика 1: Проектирование API и взаимодействия</h1>
+<section id="предисловие" class="level2">
+<h2 class="anchored" data-anchor-id="предисловие">Предисловие</h2>
+<p>В лекциях рассматриваются технические плюсы и минусы различных архитектурных подходов: базовые определения и “здравый смысл” в выборе паттернов — когда их стоит применять, а когда нет.</p>
+<p>В этой практике принцип простой: сначала проектируем, потом кодим. Цель — выбрать осмысленный бизнес-воркфлоу по варианту и заранее спроектировать API, слои и use cases.</p>
+<p><strong>Почему в практиках мы отталкиваемся от Clean Architecture</strong></p>
+<p>Строгая архитектура даёт два ключевых свойства: <strong>единообразный путь данных</strong> и <strong>общий словарь</strong>.</p>
+<p>Единообразный путь данных означает, что любой запрос проходит одну и ту же цепочку слоёв. Без этого каждый новый endpoint изобретает собственную структуру — особенно заметно при работе с llm:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Промпт</th>
+<th>Результат</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Добавь endpoint для получения пользователя по ID</td>
+<td><code>GET /users/:id</code><br><code>handler → UserRepository → ORM</code></td>
+</tr>
+<tr class="even">
+<td>Добавь endpoint для получения списка задач</td>
+<td><code>GET /tasks</code><br><code>handler → ORM</code> (напрямую)</td>
+</tr>
+<tr class="odd">
+<td>Добавь endpoint для получения статистики пользователя</td>
+<td><code>GET /users/:id/stats</code><br><code>handler → UserRepository → StatsManager → ORM</code></td>
+</tr>
+</tbody>
+</table>
+<p>Три endpoint’а — три разных решения. При отладке непонятно, где искать логику. С ростом кодовой базы хаос усугубляется.</p>
+<p>Общий словарь (<code>entity</code>, <code>use case</code>, <code>adapter</code>, <code>repository</code>) решает смежную проблему: в больших командах одни и те же роли называют <code>service</code>, <code>observer</code>, <code>manager</code>. Единые термины убирают лишний “перевод” между командами и упрощают ревью и онбординг.</p>
+<p>При этом важно не превращать терминологию в догму. Паттерны вроде Strategy, Facade, Observer никуда не исчезают — они живут внутри конкретных компонентов. Строгая архитектура фиксирует внешние границы и путь данных, а не запрещает локальные решения.</p>
+</section>
+<section id="задание" class="level2">
+<h2 class="anchored" data-anchor-id="задание">Задание</h2>
+<ol type="1">
+<li><p><strong>Выберите продукт и воркфлоу.</strong></p>
+<p>В реальной разработке бизнес описывает путь пользователя: последовательность шагов, которые человек проходит для достижения цели. Именно из этих шагов рождаются endpoints, use cases и слои приложения. Опишите сценарий пользователя на 2-3 шага бизнес-логики (не CRUD).</p>
+<p>Примеры воркфлоу по вариантам:</p>
+<ul>
+<li><strong>Интернет-магазин:</strong> пользователь открывает каталог → выбирает категорию → получает список товаров с фильтрами (цена, рейтинг) → добавляет товар в корзину → система проверяет наличие на складе → если товара нет, предлагает аналоги → оформляет заказ → система резервирует товар и создаёт заказ со статусом “ожидает оплаты”</li>
+<li><strong>Сервис доставки еды:</strong> пользователь указывает адрес → система показывает рестораны, которые доставляют в эту зону → пользователь выбирает ресторан и блюда → система считает сумму с доставкой → пользователь подтверждает → система ищет свободного курьера и назначает его</li>
+<li><strong>Такси/каршеринг:</strong> пользователь указывает точку А и Б → система рассчитывает маршрут и стоимость по тарифу → пользователь подтверждает → система ищет ближайшего свободного водителя → назначает водителя → отправляет пользователю ETA</li>
+<li><strong>Образовательная платформа:</strong> студент открывает курс → видит модули и свой прогресс → открывает урок → проходит тест → система проверяет ответы → если пройден порог, открывает следующий модуль → если все модули пройдены, генерирует сертификат</li>
+<li><strong>Банковское приложение:</strong> пользователь выбирает “перевод” → вводит номер счёта получателя → система проверяет существование счёта → вводит сумму → система проверяет достаточность средств → списывает с одного счёта, зачисляет на другой → создаёт две записи в истории транзакций</li>
+<li><strong>Медицинская система:</strong> пациент выбирает специальность врача → система показывает врачей с ближайшими свободными слотами → пациент выбирает время → система проверяет, что слот не занят → создаёт запись → отправляет подтверждение</li>
+<li><strong>Система бронирования билетов:</strong> пользователь выбирает событие → видит схему зала с доступными местами → выбирает места → система временно резервирует их (5 минут) → пользователь подтверждает → система переводит бронь в “оплачен” и генерирует билет</li>
+<li><strong>Социальная сеть:</strong> пользователь открывает ленту → система собирает посты от подписок, сортирует по времени → пользователь ставит лайк → счётчик обновляется → пишет комментарий → автор поста получает уведомление</li>
+</ul>
+<p>В каждом сценарии есть проверки, условия, несколько сущностей, которые меняют состояние вместе. Именно это и нужно спроектировать.</p>
+<p><strong>Внешние сервисы.</strong> Некоторые шаги воркфлоу требуют знаний, которых пока нет (геопоиск ближайшего водителя, генерация PDF, отправка email, рекомендации). Это нормально — разрешается сказать: “эту операцию выполняет отдельный внешний сервис” и описать его контракт. Например: <code>NearestDriverService.Find(location, radius) → Driver</code> или <code>NotificationService.Send(userId, message)</code>. В Практике 2 этот контракт реализуется заглушкой (возвращает фиксированный результат), а в дальнейших практиках, возможно, будет реализован по-настоящему. Ограничение: основной воркфлоу должен жить в вашем приложении, наружу можно вынести 1-2 операции.</p></li>
+<li><p><strong>Выберите интерфейс и протокол.</strong></p>
+<ul>
+<li>Варианты: REST (OpenAPI), GraphQL, gRPC, fullstack (HTML endpoints), комбинации.</li>
+<li>Менее стандартные подходы:
+<ul>
+<li><strong>Fullstack (сервер отдаёт HTML):</strong> Phoenix, Django, htmx</li>
+<li><strong>Внутренние микросервисы:</strong> gRPC-вызов к отдельному сервису, который выполняет тяжёлую работу</li>
+</ul></li>
+<li>Кратко обоснуйте выбор. Примеры обоснований:
+<ul>
+<li><strong>Система бронирования билетов → REST.</strong> Мы продаём API партнёрам (агрегаторы, виджеты на сайтах площадок). Клиенты — внешние, на разных языках и платформах. REST + OpenAPI spec даёт им документацию и кодогенерацию клиента из коробки.</li>
+<li><strong>Банковский сервис переводов → gRPC.</strong> Сервис работает внутри периметра компании, его вызывают другие микросервисы (мобильный BFF, процессинг). Важна типобезопасность контрактов (.proto) и скорость бинарной сериализации. Внешних потребителей нет.</li>
+<li><strong>Интернет-магазин → fullstack (HTML).</strong> Страницы каталога и карточки товаров должны индексироваться поисковиками (SEO). SSR решает проблему — сервер отдаёт готовый HTML, поисковой бот видит контент сразу.</li>
+<li><strong>Мобильное приложение соцсети → GraphQL.</strong> Экраны сильно различаются: лента показывает пост + автор + счётчик лайков, профиль — аватар + подписчики + последние посты. REST потребовал бы десятки endpoint’ов или возвращал бы лишние поля. GraphQL позволяет каждому экрану запросить ровно те данные, которые нужны.</li>
+</ul></li>
+<li>Если не хочется тратить время на выбор — REST всегда безопасный вариант. В этом и ценность Clean Architecture: бизнес-логика живёт в use cases и не зависит от интерфейса. Если позже окажется, что нужен gRPC или GraphQL — меняется только слой адаптеров, а domain и use cases остаются без изменений.</li>
+</ul></li>
+<li><p><strong>Определитесь со стеком.</strong></p>
+<ul>
+<li>Выберите язык, веб-фреймворк и подход к DI. Код в этой практике писать не нужно — но к Практике 2 вы должны чётко понимать, на чём будете реализовывать.</li>
+</ul>
+<p>Популярные экосистемы для ориентира:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Язык</th>
+<th>Веб-фреймворк</th>
+<th>DI</th>
+<th>Сильные стороны</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Go</td>
+<td>chi, echo, fiber<br>oapi-codegen (OpenAPI yaml first)<br>нативный gRPC</td>
+<td>wire (кодогенерация)<br>fx (Uber)<br>ручной DI в main.go</td>
+<td>gRPC из коробки, OpenAPI yaml first, sqlc для типобезопасного SQL</td>
+</tr>
+<tr class="even">
+<td>Python</td>
+<td>FastAPI (OpenAPI из коробки)<br>Django REST Framework<br>Flask</td>
+<td>FastAPI Depends (встроен)<br>dependency-injector</td>
+<td>Быстрый старт, автодокументация API в FastAPI</td>
+</tr>
+<tr class="odd">
+<td>Java / Kotlin</td>
+<td>Spring Boot<br>Quarkus, Micronaut<br>Ktor</td>
+<td>Spring IoC (встроен)<br>Dagger 2 (кодогенерация)<br>Koin (Kotlin)</td>
+<td>Зрелая экосистема, Spring покрывает всё</td>
+</tr>
+<tr class="even">
+<td>C#</td>
+<td>ASP.NET Core Minimal API<br>ASP.NET Core MVC</td>
+<td>встроен в ASP.NET Core<br>Autofac</td>
+<td>DI из коробки, сильная типизация</td>
+</tr>
+<tr class="odd">
+<td>TypeScript</td>
+<td>Express, Fastify<br>NestJS (DI встроен)<br>Next.js, bun</td>
+<td>NestJS (встроен)<br>tsyringe, InversifyJS</td>
+<td>Fullstack на одном языке, Next.js для SSR</td>
+</tr>
+<tr class="even">
+<td>Elixir</td>
+<td>Phoenix (LiveView / JSON API)</td>
+<td>behaviours + конфигурация</td>
+<td>Fullstack с real-time из коробки</td>
+</tr>
+</tbody>
+</table></li>
+<li><p><strong>Опишите API-контракты.</strong></p>
+<ul>
+<li>Для каждого endpoint/query/mutation: входные данные, выходные данные, ошибки.</li>
+<li>Формат: OpenAPI yaml, <code>.proto</code>, GraphQL schema или структурированная таблица.</li>
+</ul></li>
+<li><p><strong>Опишите архитектуру приложения.</strong></p>
+<ul>
+<li>Слои, компоненты, направление зависимостей, интерфейсы между слоями.</li>
+<li>На схеме <strong>обязательно</strong> явно различайте:
+<ul>
+<li>реализационные компоненты (класс/модуль/сервис),</li>
+<li>интерфейсные компоненты (порт/контракт).</li>
+</ul></li>
+<li>Для зависимостей укажите тип стрелки или подпись связи:
+<ul>
+<li><code>depends on</code> (компонент зависит от интерфейса),</li>
+<li><code>implements</code> (компонент реализует интерфейс).</li>
+</ul></li>
+<li>По умолчанию ожидается Clean Architecture. Допустимы другие подходы (MVC, framework-based и т.д.) — при условии, что вы аргументируете выбор и так же подробно расписываете слои, зависимости и контракты между ними.</li>
+</ul>
+<p><strong>Пример эталонной схемы (Clean Architecture):</strong></p>
+<!-- TODO: визуализация — assets/clean-architecture.svg: Блок-схема по слоям: сценарии зависят от портов (→), реализации реализуют порты (←). Один порт — несколько сценариев: «получить по ID» используют три сценария. -->
+<p>На схеме показан усложнённый, но типовой сценарий: несколько входных протоколов и несколько внешних хранилищ/сервисов. Стрелки направлены к центральному слою use case и отражают правило зависимостей Clean Architecture (зависимости направлены внутрь). Для этой работы минимальное требование: не менее 4 компонентов в каждом слое — входные обработчики, use case и порты. Требования по авторизации в этой практике отсутствуют: фокус на архитектуре и бизнес-логике.</p></li>
+</ol>
+<p><strong>Что сдаётся:</strong></p>
+<ol type="1">
+<li>Краткое описание продукта и выбранного воркфлоу.</li>
+<li>Обоснование выбора протокола.</li>
+<li>Выбор стека (язык, фреймворк, DI).</li>
+<li>Спецификация API (endpoint/query/mutation + request/response/errors).</li>
+<li>Схема слоёв, контрактов и зависимостей с явным различением интерфейсных и реализационных компонентов.</li>
+</ol>
+<p><strong>Теория к сдаче:</strong></p>
+<p>Лекция 1 — Принципы построения приложения:</p>
+<ul>
+<li>Что такое компонент? Контракт (интерфейс) компонента. Примеры компонентов разного масштаба (функция, класс, сервис)</li>
+<li>Что такое зависимость между компонентами? Почему неконтролируемые зависимости — проблема?</li>
+<li>Что такое слой? Правила межслойных зависимостей</li>
+<li>Продуктивность слоя: прокси-компоненты, коэффициент проксирования, когда слой не нужен</li>
+<li>Принципы SOLID (уметь объяснить каждый на примере)</li>
+<li>Dependency Injection: зачем нужен, как реализуется</li>
+<li>Clean Architecture: слои (domain, use cases, adapters, infrastructure), правило зависимостей (зависимости направлены внутрь)</li>
+</ul>
+<p>Лекция 2 — Альтернативные архитектурные паттерны:</p>
+<ul>
+<li>Framework-based архитектура (Rails/Django): что значит “opinionated framework”, плюсы и минусы</li>
+<li>Модель акторов (Erlang/Akka): изолированные процессы, обмен сообщениями, “Let it Crash”, когда применяется</li>
+<li>Data-Oriented Design: зачем оптимизировать под кеш процессора, где применяется</li>
+</ul>
+<p>Лекция 3 — Протоколы: REST / gRPC:</p>
+<ul>
+<li>REST: HTTP методы, коды ответов, JSON, URI endpoints, OpenAPI/Swagger</li>
+<li>gRPC: Protocol Buffers, HTTP/2, кодогенерация, стриминг</li>
+<li>Когда REST, когда gRPC? (публичный API vs внутренние сервисы)</li>
+</ul>
+<p>Лекция 4 — Протоколы: GraphQL / WebSocket:</p>
+<ul>
+<li>GraphQL: проблема over-fetching/under-fetching, единственный endpoint, клиент описывает структуру ответа</li>
+<li>WebSocket: проблема polling, постоянное двустороннее соединение, применение (чаты, real-time)</li>
+</ul>
+<p>Лекция 5 — Асинхронные взаимодействия: брокеры, очереди, обмен файлами:</p>
+<ul>
+<li>Зачем асинхронность: развязка сервисов, устойчивость, сглаживание пиков нагрузки</li>
+<li>Брокеры сообщений и очереди: Kafka/RabbitMQ, pub/sub vs очереди задач, at-least-once/at-most-once</li>
+<li>Событийное взаимодействие: события домена, eventual consistency, саги</li>
+<li>Надежность: идемпотентность, дедупликация, ретраи, DLQ</li>
+<li>Обмен файлами/шаринг: когда уместно, плюсы и риски, контроль версий и целостности</li>
+</ul>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Скопировано");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Скопировано");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
