@@ -2,7 +2,7 @@
 title: "Специализированные индексы для поиска"
 kind: lecture
 course: ais
-order: 11
+order: 3001
 module: 3
 draft: false
 format:

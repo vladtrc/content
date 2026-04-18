@@ -2,7 +2,7 @@
 title: "Практика 3: OLTP-система и анализ производительности"
 kind: practice
 course: ais
-order: 103
+order: 5003
 module: 5
 draft: false
 format:

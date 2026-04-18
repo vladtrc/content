@@ -2,7 +2,7 @@
 title: "Observability: логирование, мониторинг и планирование задач"
 kind: lecture
 course: ais
-order: 17
+order: 4003
 module: 4
 draft: false
 format:

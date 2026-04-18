@@ -2,7 +2,7 @@
 title: "Практика 1: Проектирование API и взаимодействия"
 kind: practice
 course: ais
-order: 101
+order: 5001
 module: 5
 draft: false
 format:

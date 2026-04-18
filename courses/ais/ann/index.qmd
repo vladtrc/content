@@ -2,7 +2,7 @@
 title: "Приближённый поиск ближайших соседей (ANN)"
 kind: lecture
 course: ais
-order: 13
+order: 3003
 module: 3
 draft: false
 format:

@@ -2,7 +2,7 @@
 title: "Практика 5: Операционные компоненты + OLAP"
 kind: practice
 course: ais
-order: 105
+order: 5005
 module: 5
 draft: false
 format:

@@ -2,7 +2,7 @@
 title: "Геопространственные структуры"
 kind: lecture
 course: ais
-order: 14
+order: 3004
 module: 3
 draft: false
 format:

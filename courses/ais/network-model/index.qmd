@@ -2,7 +2,7 @@
 title: "Сетевая модель и контракты взаимодействия"
 kind: lecture
 course: ais
-order: 3
+order: 1003
 module: 1
 draft: false
 format:

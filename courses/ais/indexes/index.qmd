@@ -2,7 +2,7 @@
 title: "Индексы: B-tree, hash и bitmap"
 kind: lecture
 course: ais
-order: 18
+order: 9001
 module: extra
 draft: false
 format:

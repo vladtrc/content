@@ -2,7 +2,7 @@
 title: "Хранилища в оперативной памяти"
 kind: lecture
 course: ais
-order: 10
+order: 2006
 module: 2
 draft: false
 format:

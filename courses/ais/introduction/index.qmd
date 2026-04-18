@@ -2,7 +2,7 @@
 title: "Введение. Принципы построения приложения"
 kind: lecture
 course: ais
-order: 1
+order: 1001
 module: 1
 draft: false
 format:

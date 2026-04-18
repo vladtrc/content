@@ -20,35 +20,38 @@ format:
 3. [Сетевая модель и контракты взаимодействия](network-model/index.qmd)
 4. [Протоколы взаимодействия: HTTP, REST, gRPC, GraphQL, WebSocket](protocols/index.qmd)
 5. [Синхронные и асинхронные модели взаимодействия сервисов](sync-async/index.qmd)
+6. [TL;DR: архитектурные решения — это выбор под задачу](tldr-architecture/index.qmd)
 
 **Модуль 2. Фундаментальные структуры хранилищ данных**
 
-6. [Классификация нагрузки](workload/index.qmd)
-7. [LSM-дерево: индексирование под запись](lsm-tree/index.qmd)
-8. [B-дерево: индексирование на диске](b-tree/index.qmd)
-9. [Физическое хранение таблиц: heap, clustered и колоночное](acid-isolation/index.qmd)
-10. [Хранилища в оперативной памяти](in-memory/index.qmd)
+7. [Классификация нагрузки](workload/index.qmd)
+8. [LSM-дерево: индексирование под запись](lsm-tree/index.qmd)
+9. [B-дерево: индексирование на диске](b-tree/index.qmd)
+10. [Хранение строк и индексы](acid-isolation/index.qmd)
+11. [Колоночное хранение](column-storage/index.qmd)
+12. [Хранилища в оперативной памяти](in-memory/index.qmd)
+13. [TL;DR: зачем нам устройство хранилищ](tldr-storage/index.qmd)
 
 **Модуль 3. Методы поиска похожих/близких элементов**
 
-11. [Специализированные индексы для поиска](search-indexes/index.qmd)
-12. [Векторный поиск и embedding](embeddings/index.qmd)
-13. [Приближённый поиск ближайших соседей (ANN)](ann/index.qmd)
-14. [Геопространственные структуры](geo/index.qmd)
+14. [Специализированные индексы для поиска](search-indexes/index.qmd)
+15. [Векторный поиск и embedding](embeddings/index.qmd)
+16. [Приближённый поиск ближайших соседей (ANN)](ann/index.qmd)
+17. [Геопространственные структуры](geo/index.qmd)
 
 **Модуль 4. Операционные компоненты**
 
-15. [Прокси и Rate Limiting](proxy-rate-limit/index.qmd)
-16. [Безопасность и управление доступом](security/index.qmd)
-17. [Observability: логирование, мониторинг и планирование задач](observability/index.qmd)
+18. [Прокси и Rate Limiting](proxy-rate-limit/index.qmd)
+19. [Безопасность и управление доступом](security/index.qmd)
+20. [Observability: логирование, мониторинг и планирование задач](observability/index.qmd)
 
 **Модуль 5. Практические задания**
 
-18. [Практика 1: Проектирование API и взаимодействия](practices/practice-1/index.qmd)
-19. [Практика 2: Реализация спроектированного приложения](practices/practice-2/index.qmd)
-20. [Практика 3: OLTP-система и анализ производительности](practices/practice-3/index.qmd)
-21. [Практика 4: Специализированные индексы и поиск](practices/practice-4/index.qmd)
-22. [Практика 5: Операционные компоненты + OLAP](practices/practice-5/index.qmd)
+21. [Практика 1: Проектирование API и взаимодействия](practices/practice-1/index.qmd)
+22. [Практика 2: Реализация спроектированного приложения](practices/practice-2/index.qmd)
+23. [Практика 3: OLTP-система и анализ производительности](practices/practice-3/index.qmd)
+24. [Практика 4: Специализированные индексы и поиск](practices/practice-4/index.qmd)
+25. [Практика 5: Операционные компоненты + OLAP](practices/practice-5/index.qmd)
 
 **Дополнительно**
 
@@ -90,6 +93,10 @@ format:
 
 ---
 
+{{< include tldr-architecture/_body.qmd >}}
+
+---
+
 ::: {.module-intro}
 # Модуль 2. Фундаментальные структуры хранилищ данных
 
@@ -116,7 +123,15 @@ format:
 
 ---
 
+{{< include column-storage/_body.qmd >}}
+
+---
+
 {{< include in-memory/_body.qmd >}}
+
+---
+
+{{< include tldr-storage/_body.qmd >}}
 
 ---
 

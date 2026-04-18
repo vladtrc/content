@@ -2,7 +2,7 @@
 title: "Практика 4: Специализированные индексы и поиск"
 kind: practice
 course: ais
-order: 104
+order: 5004
 module: 5
 draft: false
 format:

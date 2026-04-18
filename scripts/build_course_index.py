@@ -137,8 +137,31 @@ def collect_pages(course_dir: Path) -> list[dict]:
                 "order": fm["order"],
             }
         )
-    pages.sort(key=lambda p: p["order"])
+    pages.sort(key=lambda p: parse_order_key(p["order"], p["module"]))
     return pages
+
+
+def normalize_module_order(module: int | str) -> int:
+    if isinstance(module, int):
+        return module
+    if isinstance(module, str) and module.isdigit():
+        return int(module)
+    if module == "extra":
+        return 10_000
+    raise ValueError(f"unsupported module value: {module!r}")
+
+
+def parse_order_key(order: int, module: int | str) -> tuple[int, int]:
+    module_order = normalize_module_order(module)
+
+    if isinstance(order, int):
+        return (module_order, order)
+    if isinstance(order, str) and order.isdigit():
+        return (module_order, int(order))
+
+    raise ValueError(
+        f"unsupported order value: {order!r}; expected numeric encoding like 2006 or 9001"
+    )
 
 
 def render(manifest: dict, pages: list[dict]) -> str:

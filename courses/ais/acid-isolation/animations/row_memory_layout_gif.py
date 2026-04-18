@@ -6,6 +6,8 @@ from manim import (
     GREY_B,
     GREY_D,
     ORANGE,
+    PURPLE_E,
+    YELLOW_E,
     FadeIn,
     Indicate,
     Rectangle,
@@ -18,8 +20,8 @@ from manim import (
 HEADERS = ["id", "date", "product", "country", "rev"]
 COLUMN_COLORS = {
     "id": BLUE_E,
-    "date": GREY_B,
-    "product": GREY_B,
+    "date": PURPLE_E,
+    "product": YELLOW_E,
     "country": ORANGE,
     "rev": GREEN_E,
 }

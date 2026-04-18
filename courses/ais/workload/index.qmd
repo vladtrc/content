@@ -2,7 +2,7 @@
 title: "Классификация нагрузки"
 kind: lecture
 course: ais
-order: 6
+order: 2001
 module: 2
 draft: false
 format:

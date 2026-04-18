@@ -11,3 +11,4 @@ target.md
 
 /.quarto/
 **/*.quarto_ipynb
+courses/**/index.typ

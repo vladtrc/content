@@ -2,7 +2,7 @@
 title: "Синхронные и асинхронные модели взаимодействия сервисов"
 kind: lecture
 course: ais
-order: 5
+order: 1005
 module: 1
 draft: false
 format:

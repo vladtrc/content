@@ -2,7 +2,7 @@
 title: "Векторный поиск и embedding"
 kind: lecture
 course: ais
-order: 12
+order: 3002
 module: 3
 draft: false
 format:

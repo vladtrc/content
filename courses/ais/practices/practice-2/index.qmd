@@ -2,7 +2,7 @@
 title: "Практика 2: Реализация спроектированного приложения"
 kind: practice
 course: ais
-order: 102
+order: 5002
 module: 5
 draft: false
 format:
