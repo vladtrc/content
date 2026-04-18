@@ -371,61 +371,24 @@ B:      0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</code></pre>
 </section>
 <section id="почему-бывают-ложные-положительные" class="level5">
 <h5 class="anchored" data-anchor-id="почему-бывают-ложные-положительные">Почему бывают ложные положительные</h5>
-<p><code>MightContain(y)</code> для незнакомого ключа <span class="math inline">\(y\)</span> вернёт «возможно, есть», если все <span class="math inline">\(k\)</span> его битов случайно оказались выставленными другими ключами (как в примере с <code>grape</code>). Чем больше ключей мы уже запихнули в фильтр, тем больше в <span class="math inline">\(B\)</span> единиц, и тем выше шанс такого совпадения. Дальше в разделе про математику мы оценим эту вероятность количественно.</p>
+<p><code>MightContain(y)</code> для незнакомого ключа <span class="math inline">\(y\)</span> вернёт «возможно, есть», если все <span class="math inline">\(k\)</span> его битов случайно оказались выставленными другими ключами (как в примере с <code>grape</code>). Чем больше ключей мы уже запихнули в фильтр, тем больше в <span class="math inline">\(B\)</span> единиц, и тем выше шанс такого совпадения.</p>
 </section>
 </section>
-<section id="немного-математики" class="level4">
-<h4 class="anchored" data-anchor-id="немного-математики">Немного математики</h4>
-<p>Пусть в фильтре уже <span class="math inline">\(n\)</span> ключей, массив имеет <span class="math inline">\(m\)</span> бит и используется <span class="math inline">\(k\)</span> хеш-функций. Вероятность, что конкретный бит остался нулевым после всех вставок:</p>
-<p><span class="math display">\[
-\left(1 - \frac{1}{m}\right)^{k n} \approx e^{-k n / m}
-\]</span></p>
-<p>Тогда вероятность ложного срабатывания (все <span class="math inline">\(k\)</span> бит для нового ключа оказались единицами):</p>
-<p><span class="math display">\[
-p \approx \left(1 - e^{-k n / m}\right)^{k}
-\]</span></p>
-<p>Оптимальное число хеш-функций при фиксированных <span class="math inline">\(m\)</span> и <span class="math inline">\(n\)</span>:</p>
-<p><span class="math display">\[
-k^{*} = \frac{m}{n} \ln 2 \approx 0{,}693 \cdot \frac{m}{n}
-\]</span></p>
-<p>При этом выбор <span class="math inline">\(m\)</span> под заданную ошибку <span class="math inline">\(p\)</span> в пересчёте на один ключ:</p>
-<p><span class="math display">\[
-\frac{m}{n} = -\frac{\ln p}{(\ln 2)^{2}} \approx -1{,}44 \cdot \log_{2} p
-\]</span></p>
-<p>Практические ориентиры (битов на ключ):</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Целевой false positive</th>
-<th><span class="math inline">\(m / n\)</span></th>
-<th><span class="math inline">\(k^{*}\)</span></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(10\%\)</span></td>
-<td><span class="math inline">\(\approx 4{,}8\)</span></td>
-<td><span class="math inline">\(3\)</span></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(1\%\)</span></td>
-<td><span class="math inline">\(\approx 9{,}6\)</span></td>
-<td><span class="math inline">\(7\)</span></td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(0{,}1\%\)</span></td>
-<td><span class="math inline">\(\approx 14{,}4\)</span></td>
-<td><span class="math inline">\(10\)</span></td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(0{,}01\%\)</span></td>
-<td><span class="math inline">\(\approx 19{,}2\)</span></td>
-<td><span class="math inline">\(13\)</span></td>
-</tr>
-</tbody>
-</table>
-<p>Типичная настройка в RocksDB и LevelDB — <code>10</code> бит на ключ, что даёт примерно <span class="math inline">\(1\%\)</span> ложных срабатываний при <span class="math inline">\(k = 7\)</span>.</p>
-<p>Сколько это памяти на практике: SSTable с <span class="math inline">\(10^{6}\)</span> ключей при <span class="math inline">\(10\)</span> бит на ключ — это <span class="math inline">\(\approx 1{,}25\)</span> МБ bloom-фильтра. Для базы в <span class="math inline">\(10^{9}\)</span> записей суммарный размер фильтров <span class="math inline">\(\approx 1{,}25\)</span> ГБ, и такой фильтр удобно держать в RAM.</p>
+<section id="практический-смысл" class="level4">
+<h4 class="anchored" data-anchor-id="практический-смысл">Практический смысл</h4>
+<p>Для этой лекции достаточно трёх инженерных правил:</p>
+<ol type="1">
+<li>Чем <strong>больше битов на ключ</strong>, тем реже ложные срабатывания.</li>
+<li>Чем <strong>больше ключей запихнули в тот же фильтр</strong>, тем он менее полезен: всё больше битов становятся единицами.</li>
+<li>Слишком мало хешей плохо, но и слишком много тоже плохо: фильтр быстрее «забивается».</li>
+</ol>
+<p>В реальных LSM-движках обычно не выводят параметры вручную на собеседовании у доски. Важно помнить порядок величин:</p>
+<ul>
+<li>около <code>10</code> бит на ключ это типичная практическая настройка;</li>
+<li>такой фильтр даёт примерно <code>1%</code> ложных срабатываний;</li>
+<li>ложное срабатывание не ломает корректность, а лишь приводит к одному лишнему чтению SSTable.</li>
+</ul>
+<p>Оценка памяти тоже простая: <code>10</code> бит на ключ это примерно <code>1.25</code> байта на ключ. Значит SSTable с <span class="math inline">\(10^{6}\)</span> ключей потребует около <code>1.25</code> МБ под Bloom Filter, и поэтому такие фильтры обычно держат в RAM.</p>
 </section>
 <section id="место-в-чтении-lsm" class="level4">
 <h4 class="anchored" data-anchor-id="место-в-чтении-lsm">Место в чтении LSM</h4>

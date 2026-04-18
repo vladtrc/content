@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Хранение строк и индексы – prototype</title>
+<title>TL;DR: архитектурные решения — это выбор под задачу – prototype</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -22,41 +22,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -106,35 +71,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="../../../styles/site.scss">
 </head>
@@ -184,13 +120,11 @@ window.Quarto = {
     <h2 id="toc-title">Содержание</h2>
    
   <ul>
-  <li><a href="#хранение-строк-и-индексы" id="toc-хранение-строк-и-индексы" class="nav-link active" data-scroll-target="#хранение-строк-и-индексы">Хранение строк и индексы</a>
+  <li><a href="#tldr-архитектурные-решения-это-выбор-под-задачу" id="toc-tldr-архитектурные-решения-это-выбор-под-задачу" class="nav-link active" data-scroll-target="#tldr-архитектурные-решения-это-выбор-под-задачу">TL;DR: архитектурные решения — это выбор под задачу</a>
   <ul class="collapse">
-  <li><a href="#heap-строки-лежат-в-отдельном-файле" id="toc-heap-строки-лежат-в-отдельном-файле" class="nav-link" data-scroll-target="#heap-строки-лежат-в-отдельном-файле">Heap: строки лежат в отдельном файле</a></li>
-  <li><a href="#clustered-таблица-сама-лежит-в-b-tree" id="toc-clustered-таблица-сама-лежит-в-b-tree" class="nav-link" data-scroll-target="#clustered-таблица-сама-лежит-в-b-tree">Clustered: таблица сама лежит в B-tree</a></li>
-  <li><a href="#вторичные-индексы-всё-равно-живут-отдельно" id="toc-вторичные-индексы-всё-равно-живут-отдельно" class="nav-link" data-scroll-target="#вторичные-индексы-всё-равно-живут-отдельно">Вторичные индексы всё равно живут отдельно</a></li>
-  <li><a href="#heap-vs-clustered-цена-по-операциям" id="toc-heap-vs-clustered-цена-по-операциям" class="nav-link" data-scroll-target="#heap-vs-clustered-цена-по-операциям">Heap vs clustered: цена по операциям</a></li>
-  <li><a href="#почему-этого-недостаточно-для-аналитики" id="toc-почему-этого-недостаточно-для-аналитики" class="nav-link" data-scroll-target="#почему-этого-недостаточно-для-аналитики">Почему этого недостаточно для аналитики</a></li>
+  <li><a href="#зачем-это-прикладному-инженеру" id="toc-зачем-это-прикладному-инженеру" class="nav-link" data-scroll-target="#зачем-это-прикладному-инженеру">Зачем это прикладному инженеру</a></li>
+  <li><a href="#типовые-возражения" id="toc-типовые-возражения" class="nav-link" data-scroll-target="#типовые-возражения">Типовые возражения</a></li>
+  <li><a href="#итог" id="toc-итог" class="nav-link" data-scroll-target="#итог">Итог</a></li>
   </ul></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Другие форматы</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>Typst</a></li></ul></div></nav>
@@ -200,7 +134,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Хранение строк и индексы</h1>
+<h1 class="title">TL;DR: архитектурные решения — это выбор под задачу</h1>
 </div>
 
 
@@ -220,116 +154,30 @@ window.Quarto = {
 <!-- AUTOGENERATED-BACK-LINK -->
 <p><a href="../../../courses/ais/index.html" class="back-to-course">← Обратно к курсу</a></p>
 <!-- /AUTOGENERATED-BACK-LINK -->
-<section id="хранение-строк-и-индексы" class="level1">
-<h1>Хранение строк и индексы</h1>
-<p>Мы уже разобрали деревья: <code>LSM</code> и <code>B-tree</code> показали, как на диске живёт путь <code>ключ → значение</code>. Но реальная таблица хранит не один ключ, а <strong>полные строки</strong> из многих колонок. Поэтому следующий вопрос такой: где физически лежит строка целиком и как индекс до неё добирается.</p>
-<p>Эта лекция про <strong>строковое хранение</strong>: <code>heap</code>, <code>clustered</code> и отдельные индексы, которые указывают на строки, а не заменяют их.</p>
-<section id="heap-строки-лежат-в-отдельном-файле" class="level2">
-<h2 class="anchored" data-anchor-id="heap-строки-лежат-в-отдельном-файле">Heap: строки лежат в отдельном файле</h2>
-<p>Самый простой способ: завести файл под таблицу и складывать строки туда в том порядке, в котором они пришли. Такой файл называют <strong>heap</strong>. Не в смысле кучи-структуры данных, а в смысле «нет общего порядка». Так работает <code>PostgreSQL</code> по умолчанию.</p>
-<p>Файл разбит на страницы по <code>8 KB</code>. Внутри страницы лежат сами строки и каталог слотов:</p>
-<pre><code>┌────────────────────────────────┐
-│ page header                    │
-│ slot[0] → offset A             │
-│ slot[1] → offset B             │
-│ ...                            │
-│ (свободное место)              │
-│ ...                            │
-│ [tuple B: row bytes]           │
-│ [tuple A: row bytes]           │
-└────────────────────────────────┘</code></pre>
-<p>У строки есть физический адрес <code>ctid = (page_id, slot)</code> — где именно она лежит на диске сейчас.</p>
-<p>Если <strong>поверх heap-таблицы</strong> построен индекс, то этот индекс обычно хранит не полную строку, а <strong>ссылку на строку в heap</strong>. Например, <code>PRIMARY KEY</code> или индекс по <code>email</code> в <code>PostgreSQL</code> — это отдельный <code>B-tree</code>, и в листьях у него лежат пары <code>(key, ctid)</code>.</p>
-<p>Любой поиск по индексу выглядит так:</p>
-<ol type="1">
-<li>спустились по индексу и нашли <code>ctid</code>;</li>
-<li>сходили в heap по этому адресу и прочитали полную строку.</li>
-</ol>
-<p>Цена heap-схемы — лишний прыжок <code>индекс → heap</code> на чтении. Выигрыш — дешёвый <code>INSERT</code>: строку можно положить почти в любую страницу со свободным местом.</p>
-</section>
-<section id="clustered-таблица-сама-лежит-в-b-tree" class="level2">
-<h2 class="anchored" data-anchor-id="clustered-таблица-сама-лежит-в-b-tree">Clustered: таблица сама лежит в B-tree</h2>
-<p>Вторая схема: раз по первичному ключу всё равно нужен <code>B-tree</code>, можно хранить в листьях дерева сразу <strong>полные строки</strong>. Так устроены <code>MySQL InnoDB</code>, <code>SQLite</code>, <code>Oracle IOT</code>.</p>
-<p>Такую таблицу называют <strong>clustered index</strong> или <strong>index-organized table</strong>. Таблица физически упорядочена по первичному ключу.</p>
-<p>На чтении это удобно: поиск по <code>PK</code> делает один спуск по дереву и сразу получает строку. Отдельного heap-файла нет.</p>
-<p>На записи дороже:</p>
+<section id="tldr-архитектурные-решения-это-выбор-под-задачу" class="level1">
+<h1>TL;DR: архитектурные решения — это выбор под задачу</h1>
+<p>За модуль мы разобрали:</p>
 <ul>
-<li><code>INSERT</code> должен найти точное место в отсортированном дереве;</li>
-<li>при переполнении лист надо расщепить;</li>
-<li>случайный <code>PK</code> вроде <code>UUIDv4</code> даёт более болезненные вставки, чем монотонный ключ.</li>
+<li><strong>Компоненты, слои, SOLID, DI</strong> — как физически организован код и кто от кого зависит, почему без внедрения зависимостей тесты превращаются в мучение, а замена инфраструктуры — в переписывание половины системы.</li>
+<li><strong>Архитектурные стили</strong> — Clean Architecture, framework-based (Rails, Django), Actor Model (Erlang, Akka), Data-Oriented Design. Каждый оптимизирован под свой класс задач: стартап, телеком с пятью девятками, игровой движок.</li>
+<li><strong>Сетевая модель OSI и контракты API</strong> — от напряжения на проводе до OpenAPI/proto/GraphQL SDL. Каждый уровень — отдельный договор; верхние не знают, как работают нижние.</li>
+<li><strong>Прикладные протоколы</strong> — REST, gRPC, GraphQL, WebSocket. Разные по модели (запрос-ответ, RPC, графовая выборка, двусторонний поток), производительности и цене эксплуатации.</li>
+<li><strong>Синхронные и асинхронные модели</strong> — прямой вызов с ожиданием против публикации в брокер. У синхронного вызова есть свой контур устойчивости: <code>timeout</code>, <code>retry</code> c <code>backoff</code>/<code>jitter</code>, <code>idempotency</code>, <code>circuit breaker</code>, <code>deadline propagation</code>.</li>
 </ul>
-<p>Из-за этого clustered-хранение обычно любит растущие ключи лучше, чем случайные.</p>
+<section id="зачем-это-прикладному-инженеру" class="level2">
+<h2 class="anchored" data-anchor-id="зачем-это-прикладному-инженеру">Зачем это прикладному инженеру</h2>
+<p>Модуль — про <strong>выбор под ограничения</strong>, а не про «правильный способ». REST не лучше gRPC, Clean Architecture не лучше Rails, синхронный вызов не лучше асинхронного. У каждого — свой класс задач и своя цена.</p>
+<p>Полезно ли зубрить все семь уровней OSI? Сомнительно. Но понимать, что TLS отвечает за шифрование, TCP — за надёжную доставку, а HTTP — за прикладной смысл, бесценно: когда API «не работает», вы сузите причину за минуту, а не за час.</p>
 </section>
-<section id="вторичные-индексы-всё-равно-живут-отдельно" class="level2">
-<h2 class="anchored" data-anchor-id="вторичные-индексы-всё-равно-живут-отдельно">Вторичные индексы всё равно живут отдельно</h2>
-<p>Даже если таблица clustered, <strong>вторичный индекс не становится таблицей</strong>. Он по-прежнему отдельная структура доступа.</p>
-<p>В <code>PostgreSQL</code> вторичный индекс хранит что-то вроде:</p>
-<p><span class="math display">\[
-\text{search key} \rightarrow \text{ctid}
-\]</span></p>
-<p>В <code>InnoDB</code> физический адрес строки ненадёжен: строки могут переехать между листьями дерева. Поэтому вторичный индекс хранит не адрес, а <code>PK</code>:</p>
-<p><span class="math display">\[
-\text{secondary key} \rightarrow \text{primary key} \rightarrow \text{row}
-\]</span></p>
-<p>Отсюда двойной спуск: сначала по вторичному индексу, потом по кластерному.</p>
-<p>То же относится и к <code>hash index</code>: он тоже хранится <strong>отдельно от таблицы</strong>. Разница только в способе поиска:</p>
-<p><span class="math display">\[
-\text{hash}(key) \rightarrow \text{bucket} \rightarrow \text{row locator}
-\]</span></p>
-<p><code>Hash index</code> хорош для поиска по точному равенству, но он не хранит строки «внутри себя» и не умеет диапазоны. Поэтому его полезно воспринимать не как другой способ хранения таблицы, а как ещё один отдельный путь доступа к тем же строкам.</p>
-<p>Практический вывод простой: <strong>каждый индекс — это отдельная структура, которую надо поддерживать при записи</strong>.</p>
+<section id="типовые-возражения" class="level2">
+<h2 class="anchored" data-anchor-id="типовые-возражения">Типовые возражения</h2>
+<p>«Все вокруг пишут микросервисы, давайте порежем монолит» звучит современно, но каждый новый синхронный вызов приносит с собой <code>timeout</code>, <code>retry</code>, идемпотентность, <code>circuit breaker</code> и передачу дедлайна. Поэтому перед дроблением сначала проверяют, действительно ли нужны командная автономия, независимый деплой и изоляция отказов, или достаточно нормальной модульности внутри монолита.</p>
+<p>«Возьмём REST, потому что все так делают» так же плох как любой выбор по привычке. Для публичного API обычно удобен REST с OpenAPI, для плотного внутреннего трафика часто лучше gRPC, для гибкой выборки полей клиентом может подойти GraphQL; критерий здесь один и тот же: требования к латентности, трафику, отладке и эволюции контракта.</p>
+<p>«Пусть пользователь подождёт тридцать секунд в синхронном запросе» обычно заканчивается зависшим UI и обрывами на балансировщике. Такие операции выносят в фон: <code>POST /reports</code> возвращает <code>202 Accepted</code> и <code>job_id</code>, задача уходит в брокер, результат приходит через polling или WebSocket-push.</p>
 </section>
-<section id="heap-vs-clustered-цена-по-операциям" class="level2">
-<h2 class="anchored" data-anchor-id="heap-vs-clustered-цена-по-операциям">Heap vs clustered: цена по операциям</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Операция</th>
-<th>Heap (<code>PostgreSQL</code>)</th>
-<th>Clustered (<code>InnoDB</code>)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Поиск по <code>PK</code></td>
-<td>индекс → heap</td>
-<td>один спуск до листа</td>
-</tr>
-<tr class="even">
-<td>Поиск по вторичному индексу</td>
-<td>индекс → heap</td>
-<td>вторичный → <code>PK</code> → кластерный</td>
-</tr>
-<tr class="odd">
-<td><code>INSERT</code></td>
-<td>в любую страницу со свободным местом</td>
-<td>в точное место в сортировке, возможно расщепление</td>
-</tr>
-<tr class="even">
-<td>Диапазон по <code>PK</code></td>
-<td>случайный <code>I/O</code> по heap</td>
-<td>последовательный проход по листьям</td>
-</tr>
-<tr class="odd">
-<td>Чувствительность к форме <code>PK</code></td>
-<td>низкая</td>
-<td>высокая</td>
-</tr>
-</tbody>
-</table>
-<p>Грубо: <strong>heap удобнее для записи, clustered — для чтения по первичному ключу и диапазонам</strong>.</p>
-</section>
-<section id="почему-этого-недостаточно-для-аналитики" class="level2">
-<h2 class="anchored" data-anchor-id="почему-этого-недостаточно-для-аналитики">Почему этого недостаточно для аналитики</h2>
-<p>И heap, и clustered хранят строку <strong>целиком</strong>: все поля пользователя, заказа или события лежат рядом. Это идеальная раскладка для запроса вида:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> users <span class="kw">WHERE</span> <span class="kw">id</span> <span class="op">=</span> <span class="dv">123</span>;</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Но у аналитических запросов другая форма: они часто читают <strong>мало колонок из очень многих строк</strong>. Там строковая раскладка начинает тянуть с диска лишние данные.</p>
-<p>В следующей лекции посмотрим, как работает <strong>колоночное хранение</strong>, почему оно выигрывает на агрегациях и как из этой физики вырастает разделение на <code>OLTP</code> и <code>OLAP</code>.</p>
+<section id="итог" class="level2">
+<h2 class="anchored" data-anchor-id="итог">Итог</h2>
+<p>Модуль 1 — про то, как <strong>не привыкать к одному инструменту</strong>. Протоколы, архитектурные стили, синхронные и асинхронные модели — это шкала вариантов, из которой выбирают под задачу. Без этой шкалы инженер решает по привычке; с ней — по критериям конкретной системы.</p>
 
 
 </section>
