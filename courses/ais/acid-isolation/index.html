@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>ACID, уровни изоляции, аналитические и транзакционные хранилища – prototype</title>
+<title>Физическое хранение таблиц: heap, clustered и колоночное – prototype</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -106,6 +106,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../../styles/site.scss">
 </head>
@@ -155,14 +184,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Содержание</h2>
    
   <ul>
-  <li><a href="#acid-уровни-изоляции-аналитические-и-транзакционные-хранилища" id="toc-acid-уровни-изоляции-аналитические-и-транзакционные-хранилища" class="nav-link active" data-scroll-target="#acid-уровни-изоляции-аналитические-и-транзакционные-хранилища">ACID, уровни изоляции, аналитические и транзакционные хранилища</a>
+  <li><a href="#физическое-хранение-таблиц-heap-clustered-и-колоночное" id="toc-физическое-хранение-таблиц-heap-clustered-и-колоночное" class="nav-link active" data-scroll-target="#физическое-хранение-таблиц-heap-clustered-и-колоночное">Физическое хранение таблиц: heap, clustered и колоночное</a>
   <ul class="collapse">
-  <li><a href="#транзакции" id="toc-транзакции" class="nav-link" data-scroll-target="#транзакции">Транзакции</a></li>
-  <li><a href="#acid-atomicity-consistency-isolation-durability" id="toc-acid-atomicity-consistency-isolation-durability" class="nav-link" data-scroll-target="#acid-atomicity-consistency-isolation-durability">ACID (Atomicity, Consistency, Isolation, Durability)</a></li>
-  <li><a href="#транзакционные-и-аналитические-хранилища" id="toc-транзакционные-и-аналитические-хранилища" class="nav-link" data-scroll-target="#транзакционные-и-аналитические-хранилища">Транзакционные и аналитические хранилища</a></li>
-  <li><a href="#пример-1-маркетплейс" id="toc-пример-1-маркетплейс" class="nav-link" data-scroll-target="#пример-1-маркетплейс">Пример 1: маркетплейс</a></li>
-  <li><a href="#пример-2-строковое-vs-колоночное-хранение" id="toc-пример-2-строковое-vs-колоночное-хранение" class="nav-link" data-scroll-target="#пример-2-строковое-vs-колоночное-хранение">Пример 2: строковое vs колоночное хранение</a></li>
-  <li><a href="#сжатие-колонок" id="toc-сжатие-колонок" class="nav-link" data-scroll-target="#сжатие-колонок">Сжатие колонок</a></li>
+  <li><a href="#heap-строки-лежат-кучей" id="toc-heap-строки-лежат-кучей" class="nav-link" data-scroll-target="#heap-строки-лежат-кучей">Heap: строки лежат кучей</a></li>
+  <li><a href="#index-organized-table-таблица-и-есть-индекс" id="toc-index-organized-table-таблица-и-есть-индекс" class="nav-link" data-scroll-target="#index-organized-table-таблица-и-есть-индекс">Index-organized table: таблица <em>и есть</em> индекс</a></li>
+  <li><a href="#heap-vs-clustered-цена-по-операциям" id="toc-heap-vs-clustered-цена-по-операциям" class="nav-link" data-scroll-target="#heap-vs-clustered-цена-по-операциям">Heap vs clustered: цена по операциям</a></li>
+  <li><a href="#а-всегда-ли-нужна-вся-строка" id="toc-а-всегда-ли-нужна-вся-строка" class="nav-link" data-scroll-target="#а-всегда-ли-нужна-вся-строка">А всегда ли нужна вся строка?</a></li>
+  <li><a href="#поколоночное-хранение" id="toc-поколоночное-хранение" class="nav-link" data-scroll-target="#поколоночное-хранение">Поколоночное хранение</a></li>
+  <li><a href="#компрессия-как-бонус-от-колонок" id="toc-компрессия-как-бонус-от-колонок" class="nav-link" data-scroll-target="#компрессия-как-бонус-от-колонок">Компрессия как бонус от колонок</a></li>
+  <li><a href="#цена-записи-в-колоночной-раскладке" id="toc-цена-записи-в-колоночной-раскладке" class="nav-link" data-scroll-target="#цена-записи-в-колоночной-раскладке">Цена записи в колоночной раскладке</a></li>
+  <li><a href="#oltp-vs-olap-как-следствие-раскладки" id="toc-oltp-vs-olap-как-следствие-раскладки" class="nav-link" data-scroll-target="#oltp-vs-olap-как-следствие-раскладки">OLTP vs OLAP как следствие раскладки</a></li>
+  <li><a href="#пример-маркетплейс" id="toc-пример-маркетплейс" class="nav-link" data-scroll-target="#пример-маркетплейс">Пример: маркетплейс</a></li>
   </ul></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Другие форматы</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>Typst</a></li></ul></div></nav>
@@ -172,7 +204,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">ACID, уровни изоляции, аналитические и транзакционные хранилища</h1>
+<h1 class="title">Физическое хранение таблиц: heap, clustered и колоночное</h1>
 </div>
 
 
@@ -192,49 +224,103 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- AUTOGENERATED-BACK-LINK -->
 <p><a href="../../../courses/ais/index.html" class="back-to-course">← Обратно к курсу</a></p>
 <!-- /AUTOGENERATED-BACK-LINK -->
-<section id="acid-уровни-изоляции-аналитические-и-транзакционные-хранилища" class="level1">
-<h1>ACID, уровни изоляции, аналитические и транзакционные хранилища</h1>
-<p>После изучения структур хранения (LSM, B-tree) возникает вопрос: <strong>как гарантировать корректность данных при одновременной работе множества клиентов?</strong></p>
-<p>Представьте банковский перевод: деньги списываются со счёта А и зачисляются на счёт Б. Если между двумя операциями произойдет сбой, деньги могут исчезнуть (списались, но не зачислились) или удвоиться. Нужен механизм, гарантирующий: <strong>либо обе операции выполнены, либо ни одна</strong>.</p>
-<p>Эта лекция вводит концепцию <strong>транзакций</strong> и свойства <strong>ACID</strong>: - <strong>Atomicity</strong> — всё или ничего (commit или rollback) - <strong>Consistency</strong> — данные остаются корректными (не нарушаются ограничения целостности) - <strong>Isolation</strong> — параллельные транзакции не мешают друг другу - <strong>Durability</strong> — после commit данные сохранены даже при сбое</p>
-<p>Особенно сложен вопрос <strong>изоляции</strong>: если две транзакции читают и меняют одни и те же строки, какой результат они увидят? Лекция разбирает уровни изоляции (Read Uncommitted, Read Committed, Repeatable Read, Serializable) и аномалии (dirty read, phantom read).</p>
-<section id="транзакции" class="level2">
-<h2 class="anchored" data-anchor-id="транзакции">Транзакции</h2>
-<p>Транзакция</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">BEGIN</span>;</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">UPDATE</span> accounts <span class="kw">SET</span> balance <span class="op">=</span> balance <span class="op">-</span> <span class="dv">100</span> <span class="kw">WHERE</span> <span class="kw">id</span> <span class="op">=</span> <span class="dv">1</span>;</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">UPDATE</span> accounts <span class="kw">SET</span> balance <span class="op">=</span> balance <span class="op">+</span> <span class="dv">100</span> <span class="kw">WHERE</span> <span class="kw">id</span> <span class="op">=</span> <span class="dv">2</span>;</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">COMMIT</span>;  <span class="co">-- или ROLLBACK для отката</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="acid-atomicity-consistency-isolation-durability" class="level2">
-<h2 class="anchored" data-anchor-id="acid-atomicity-consistency-isolation-durability">ACID (Atomicity, Consistency, Isolation, Durability)</h2>
+<section id="физическое-хранение-таблиц-heap-clustered-и-колоночное" class="level1">
+<h1>Физическое хранение таблиц: heap, clustered и колоночное</h1>
+<p>LSM и B-дерево показали, как на диске живёт одна пара <code>ключ → значение</code>: первое оптимизировано под запись, второе — под предсказуемое чтение. Но реальная таблица — это не одна пара. Это миллионы строк по многу колонок, и возникают два новых вопроса:</p>
 <ul>
-<li><strong>Atomicity</strong> — транзакция выполняется полностью или не выполняется вовсе; реализуется через WAL</li>
-<li><strong>Consistency</strong> — поддерживаются ограничения целостности (foreign keys, constraints)</li>
-<li><strong>Isolation</strong> — параллельные транзакции не влияют друг на друга; регулируется уровнями изоляции</li>
-<li><strong>Durability</strong> — изменения сохраняются навсегда после COMMIT; обеспечивается fsync</li>
+<li>где физически лежат <em>сами строки</em> таблицы;</li>
+<li>как индекс добирается от ключа до полной строки со всеми полями.</li>
 </ul>
+<p>Ответ определяет цену <code>INSERT</code>, цену точечного чтения, цену агрегирующего скана — и в конце концов разделение баз на транзакционные и аналитические.</p>
+<section id="heap-строки-лежат-кучей" class="level2">
+<h2 class="anchored" data-anchor-id="heap-строки-лежат-кучей">Heap: строки лежат кучей</h2>
+<p>Самый простой способ — завести файл под таблицу и складывать строки туда в том порядке, в котором они пришли. Этот файл называют <strong>heap</strong> — не в смысле кучи-структуры данных, а буквально «свалка, куда нет очереди». Так работает <code>PostgreSQL</code> по умолчанию, так же исторически устроен <code>Oracle</code>.</p>
+<p>Файл разбит на страницы по <code>8 KB</code>. Внутри страницы:</p>
+<pre><code>┌────────────────────────────────┐
+│ page header                    │
+│ slot[0] → offset A             │ ← каталог слотов
+│ slot[1] → offset B             │
+│ ...                            │
+│ (свободное место)              │
+│ ...                            │
+│ [tuple B: row bytes]           │ ← сами строки
+│ [tuple A: row bytes]           │
+└────────────────────────────────┘</code></pre>
+<p>У каждой строки есть физический адрес <code>ctid = (page_id, slot)</code> — «эта строка на диске прямо сейчас».</p>
+<p>Теперь индексы. Первичный ключ в heap-таблице — это <strong>обычный B-tree</strong>, не более особенный, чем индекс по <code>email</code>: в листьях он хранит пары <code>(ключ, ctid)</code>. Любой поиск по индексу — два шага:</p>
+<ol type="1">
+<li>спуск по B-tree → получили <code>ctid</code>;</li>
+<li>одно обращение к нужной странице heap → получили строку.</li>
+</ol>
+<p>Heap платит этим лишним прыжком за то, что <code>INSERT</code> почти бесплатный: база берёт <em>любую</em> страницу со свободным местом и кладёт туда строку. Никакой перестройки дерева на запись, никаких расщеплений листьев в таблице.</p>
 </section>
-<section id="транзакционные-и-аналитические-хранилища" class="level2">
-<h2 class="anchored" data-anchor-id="транзакционные-и-аналитические-хранилища">Транзакционные и аналитические хранилища</h2>
-<p>OLTP - Паттерн: много мелких операций чтения/записи отдельных записей - Примеры запросов: - <code>SELECT * FROM users WHERE id = 123</code> - <code>UPDATE orders SET status = 'shipped' WHERE id = 456</code> - <code>INSERT INTO transactions (user_id, amount) VALUES (789, 100.50)</code> - Строковое хранение (row-oriented): вся строка читается за один блок диска - СУБД: PostgreSQL, MySQL, Oracle - Применение: интернет-магазины, банковские системы, CRM</p>
-<p>OLAP - Паттерн: большие агрегирующие запросы по миллионам строк - Примеры запросов: - <code>SELECT country, SUM(revenue) FROM sales GROUP BY country</code> - <code>SELECT date, COUNT(*) FROM events WHERE timestamp &gt; '2024-01-01' GROUP BY date</code> - Анализ трендов, построение отчётов, data science - Колоночное хранение (column-oriented): колонки хранятся последовательно - Читаем только нужные колонки (не всю строку) - Лучше сжатие: однотипные данные в одном блоке - Векторизованные вычисления на CPU - СУБД: ClickHouse, Apache Druid, Vertica, Snowflake - Применение: аналитика метрик, BI-дашборды, Data Warehouses - Недостатки: медленные вставки и UPDATE/DELETE отдельных записей</p>
+<section id="index-organized-table-таблица-и-есть-индекс" class="level2">
+<h2 class="anchored" data-anchor-id="index-organized-table-таблица-и-есть-индекс">Index-organized table: таблица <em>и есть</em> индекс</h2>
+<p>Альтернативный ход: раз по первичному ключу всё равно нужен B-tree, пусть сама таблица им и будет. В листьях дерева лежат не <code>ctid</code>, а <strong>целые строки</strong>. Так устроены <code>MySQL InnoDB</code>, <code>SQLite</code>, <code>Oracle IOT</code>. Такой подход называют <strong>index-organized table</strong> или <strong>clustered index</strong> — таблица физически упорядочена по PK.</p>
+<p>На чтении это выигрыш: поиск по PK — один спуск до листа, и сразу получаем строку. Лишнего прыжка в отдельный файл нет.</p>
+<p>На записи — цена. <code>INSERT</code> должен найти <em>правильное место</em> в отсортированном дереве и, если лист переполнен, расщепить его. Поэтому в БД, которые используют такую схему, болезненно вставлять со случайным PK (например, <code>UUIDv4</code>) и комфортно — с монотонно растущим: монотонные вставки всегда попадают в последний лист. Отсюда правило «делай PK монотонным».</p>
+<p>Скрытая вторая цена — <strong>вторичные индексы</strong>. Они не могут хранить физический адрес строки: расщепление переставляет строки между листьями, адрес бы устарел. Поэтому вторичный индекс <code>InnoDB</code> хранит PK:</p>
+<p><span class="math display">\[
+\text{secondary key} \rightarrow \text{primary key} \rightarrow \text{row}
+\]</span></p>
+<p>Получается <strong>двойной спуск</strong>: сначала по вторичному дереву, потом по кластерному. В <code>PostgreSQL</code> такой наценки нет — все индексы ссылаются в <code>ctid</code>.</p>
 </section>
-<section id="пример-1-маркетплейс" class="level2">
-<h2 class="anchored" data-anchor-id="пример-1-маркетплейс">Пример 1: маркетплейс</h2>
-<p>Вы заходите на маркетплейс. Какие данные куда попадают?</p>
-<p><strong>OLTP (транзакционные операции):</strong> - Добавление товара в корзину → <code>INSERT INTO cart (user_id, product_id)</code> - Подписка на продавца → <code>UPDATE users SET subscriptions = subscriptions || 123</code> - Оформление заказа → транзакция с несколькими <code>INSERT/UPDATE</code> - Проверка наличия товара → <code>SELECT stock FROM products WHERE id = 456</code></p>
-<p><strong>OLAP (аналитические события):</strong> - Клики по экранам/категориям → поток событий <code>(user_id, screen, timestamp)</code> - Время на странице → <code>(user_id, page_id, duration_sec)</code> - Информация о девайсе → <code>(user_id, device_type, os, browser)</code> - Просмотры товаров без покупки → <code>(user_id, product_id, timestamp)</code></p>
-<p>Эти события собираются батчами и загружаются в OLAP-хранилище для анализа:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Сколько пользователей iOS заходило на категорию "Электроника" за неделю?</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> user_id)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="kw">events</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> screen <span class="op">=</span> <span class="st">'category_electronics'</span> <span class="kw">AND</span> os <span class="op">=</span> <span class="st">'iOS'</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">AND</span> <span class="dt">timestamp</span> <span class="op">&gt;</span> NOW() <span class="op">-</span> <span class="dt">INTERVAL</span> <span class="st">'7 days'</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="heap-vs-clustered-цена-по-операциям" class="level2">
+<h2 class="anchored" data-anchor-id="heap-vs-clustered-цена-по-операциям">Heap vs clustered: цена по операциям</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Операция</th>
+<th>Heap (PostgreSQL)</th>
+<th>Clustered (InnoDB)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Поиск по PK</td>
+<td>индекс → heap (2 обращения)</td>
+<td>один спуск до листа</td>
+</tr>
+<tr class="even">
+<td>Поиск по вторичному индексу</td>
+<td>индекс → heap</td>
+<td>вторичный → PK → кластерный (двойной спуск)</td>
+</tr>
+<tr class="odd">
+<td><code>INSERT</code></td>
+<td>в любую страницу со свободным местом</td>
+<td>в точное место в сортировке, возможно расщепление</td>
+</tr>
+<tr class="even">
+<td>Диапазон по PK</td>
+<td>случайный I/O по heap</td>
+<td>последовательный по листьям</td>
+</tr>
+<tr class="odd">
+<td>Чувствительность к форме PK</td>
+<td>нет</td>
+<td>есть: случайный PK = боль</td>
+</tr>
+</tbody>
+</table>
+<p>Грубо: <strong>heap удобнее для записи, clustered — для точечных и диапазонных чтений по PK</strong>. Но обе формы одинаково честно хранят <em>всю строку целиком рядом</em> — и именно это мы дальше поставим под вопрос.</p>
 </section>
-<section id="пример-2-строковое-vs-колоночное-хранение" class="level2">
-<h2 class="anchored" data-anchor-id="пример-2-строковое-vs-колоночное-хранение">Пример 2: строковое vs колоночное хранение</h2>
-<p>Таблица <code>sales</code> (5 строк):</p>
+<section id="а-всегда-ли-нужна-вся-строка" class="level2">
+<h2 class="anchored" data-anchor-id="а-всегда-ли-нужна-вся-строка">А всегда ли нужна вся строка?</h2>
+<p>Заметим: и в heap, и в clustered все поля одной строки лежат в одной странице подряд. Это идеальная раскладка для запроса «дай мне пользователя 123» — одна страница, одно чтение, все поля сразу. OLTP-нагрузка именно такая.</p>
+<p>Но рассмотрим запрос другой формы:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">AVG</span>(revenue) <span class="kw">FROM</span> sales;</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>База должна пройти <em>все</em> строки таблицы, но из каждой ей нужно ровно одно поле. Если <code>sales</code> весит <code>200 GB</code> и содержит 20 колонок, построчное хранение заставит прочитать все <code>200 GB</code> — хотя сама колонка <code>revenue</code> на диске, скажем, <code>15 GB</code>. Остальные <code>185 GB</code> проехали через диск и буферный пул впустую.</p>
+<p>Для такого класса запросов хочется разложить таблицу не по строкам, а <strong>по колонкам</strong>: все значения <code>revenue</code> подряд, все значения <code>country</code> подряд, и так далее.</p>
+</section>
+<section id="поколоночное-хранение" class="level2">
+<h2 class="anchored" data-anchor-id="поколоночное-хранение">Поколоночное хранение</h2>
+<p>Возьмём маленькую таблицу <code>sales</code>:</p>
 <pre><code>| id | date       | product  | country | revenue |
 |----|------------|----------|---------|---------|
 | 1  | 2024-01-10 | Laptop   | USA     | 1200    |
@@ -242,56 +328,109 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 | 3  | 2024-01-11 | Laptop   | USA     | 1200    |
 | 4  | 2024-01-11 | Tablet   | France  | 600     |
 | 5  | 2024-01-12 | Phone    | Germany | 800     |</code></pre>
-<p><strong>Строковое хранение (OLTP):</strong></p>
-<pre><code>Блок 1: [1, 2024-01-10, Laptop, USA, 1200]
-Блок 2: [2, 2024-01-10, Phone, Germany, 800]
-Блок 3: [3, 2024-01-11, Laptop, USA, 1200]
-...</code></pre>
-<p>Запрос <code>SELECT * FROM sales WHERE id = 3</code> → читаем 1 блок (быстро). Запрос <code>SELECT SUM(revenue) FROM sales</code> → читаем все 5 блоков, парсим все колонки (медленно).</p>
-<p><strong>Колоночное хранение (OLAP):</strong></p>
+<p><strong>Построчное хранение</strong> — как устроены <code>PostgreSQL</code> и <code>InnoDB</code>:</p>
+<pre><code>страница: [1, 2024-01-10, Laptop, USA, 1200][2, 2024-01-10, Phone, Germany, 800]...</code></pre>
+<p><strong>Поколоночное хранение</strong> — как устроены <code>ClickHouse</code>, <code>Vertica</code>, <code>Snowflake</code>, форматы <code>Parquet</code> и <code>ORC</code>:</p>
 <pre><code>id:      [1, 2, 3, 4, 5]
 date:    [2024-01-10, 2024-01-10, 2024-01-11, 2024-01-11, 2024-01-12]
 product: [Laptop, Phone, Laptop, Tablet, Phone]
 country: [USA, Germany, USA, France, Germany]
 revenue: [1200, 800, 1200, 600, 800]</code></pre>
-<p>Запрос <code>SELECT SUM(revenue) FROM sales</code> → читаем только колонку <code>revenue</code> (быстро). Запрос <code>SELECT * FROM sales WHERE id = 3</code> → читаем все 5 колонок и собираем строку (медленно).</p>
-<p><strong>Сжатие на колоночном хранении:</strong> - <code>revenue: [1200, 800, 1200, 600, 800]</code> - Dictionary Encoding: словарь <code>{1200→0, 800→1, 600→2}</code>, массив <code>[0,1,0,2,1]</code> - Было: 5 × 4 байта = 20 байт, стало: 3 × 4 + 5 × 2 бита = ~13 байт - <code>country: [USA, Germany, USA, France, Germany]</code> - Dictionary: <code>{USA→0, Germany→1, France→2}</code>, массив <code>[0,1,0,2,1]</code> - Было: ~35 байт (строки), стало: ~15 байт (словарь + индексы) - <code>product: [Laptop, Phone, Laptop, Tablet, Phone]</code> - Dictionary + RLE: <code>[(Laptop,1), (Phone,1), (Laptop,1), (Tablet,1), (Phone,1)]</code></p>
+<p>Разница на двух запросах:</p>
+<ul>
+<li><code>SELECT SUM(revenue) FROM sales</code> — построчное хранение читает все страницы и из каждой достаёт одно поле; поколоночное читает один файл колонки <code>revenue</code>. Экономия по I/O — во столько раз, сколько колонок в таблице.</li>
+<li><code>SELECT * FROM sales WHERE id = 3</code> — построчное отдаст строку из одной страницы; поколоночное должно дотянуться до третьей позиции в каждой из пяти колонок и собрать строку обратно.</li>
+</ul>
+<p>Построчное хранение оптимизирует «мало строк, много колонок на строку». Поколоночное — «много строк, мало колонок в запросе».</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../../courses/ais/acid-isolation/generated/row_vs_column_layout.png" class="img-fluid figure-img"></p>
+<figcaption>Слева строка хранится целиком, справа значения одной колонки лежат подряд.</figcaption>
+</figure>
+</div>
+<p>На одной и той же таблице видно, как плоско укладываются байты в памяти при разных раскладках.</p>
+<p>Сначала построчно — таблица читается по строкам, ячейки ложатся в ленту в порядке <code>строка 1, строка 2, строка 3</code>:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../../courses/ais/acid-isolation/generated/row_memory_layout.gif" class="img-fluid figure-img"></p>
+<figcaption>Построчно: строки в памяти лежат подряд.</figcaption>
+</figure>
+</div>
+<p>Теперь поколоночно — та же таблица, но обход колонка за колонкой: сначала весь <code>id</code>, потом <code>date</code>, и так до <code>rev</code>:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../../courses/ais/acid-isolation/generated/column_memory_layout.gif" class="img-fluid figure-img"></p>
+<figcaption>Поколоночно: колонки в памяти лежат подряд.</figcaption>
+</figure>
+</div>
 </section>
-<section id="сжатие-колонок" class="level2">
-<h2 class="anchored" data-anchor-id="сжатие-колонок">Сжатие колонок</h2>
-<p><strong>Run-Length Encoding (RLE)</strong> — кодирование серий повторяющихся значений:</p>
-<pre><code>Исходные данные: [5, 5, 5, 5, 3, 3, 7]
-После RLE:       [(5, 4), (3, 2), (7, 1)]  // (значение, количество)</code></pre>
-<p>Эффективно для колонок с длинными последовательностями одинаковых значений (статусы, флаги, отсортированные данные).</p>
-<p><strong>Dictionary Encoding</strong> — замена повторяющихся значений индексами в словаре:</p>
-<pre><code>Исходные данные: [USA, Germany, USA, France, Germany, USA]
-Словарь:         {USA→0, Germany→1, France→2}
-После кодирования: [0, 1, 0, 2, 1, 0]
-
-Было: 6 строк × ~7 байт = 42 байта
-Стало: 3 строки словаря (21 байт) + 6 индексов × 2 бита = ~23 байта</code></pre>
-<p>Эффективно для строковых колонок с низкой кардинальностью (страны, категории, статусы).</p>
-<p><strong>Bit Packing</strong> — использование минимального числа битов для хранения чисел:</p>
-<pre><code>Данные: [5, 12, 3, 15, 7]  // максимум = 15 → нужно 4 бита
-Обычное хранение: 5 × 32 бита = 160 бит
-Bit packing: 5 × 4 бита = 20 бит (сжатие в 8 раз)</code></pre>
-<p>Эффективно для чисел с ограниченным диапазоном (возраст, рейтинги, маленькие счётчики).</p>
-<p><strong>Delta Encoding</strong> — хранение разностей между последовательными значениями:</p>
-<pre><code>Timestamps: [1704067200, 1704067260, 1704067320, 1704067380]
-            (2024-01-01 00:00:00, +60s, +60s, +60s)
-После delta: [1704067200, 60, 60, 60]
-
-Было: 4 × 32 бита = 128 бит
-Стало: 32 бита (база) + 3 × 7 бит (дельты) = ~53 бита</code></pre>
-<p>Эффективно для монотонных последовательностей (timestamp, auto-increment id, версии).</p>
-<p><strong>Frame of Reference (FOR)</strong> — вычитание минимума + bit packing:</p>
-<pre><code>Данные: [1005, 1012, 1003, 1015, 1007]
-Min = 1003, вычитаем: [2, 9, 0, 12, 4]
-Максимум = 12 → нужно 4 бита
-
-Было: 5 × 32 бита = 160 бит
-Стало: 32 бита (min) + 5 × 4 бита = 52 бита (сжатие в 3 раза)</code></pre>
-<p>Эффективно для чисел в узком диапазоне (цены в одной категории, ID в пределах батча).</p>
+<section id="компрессия-как-бонус-от-колонок" class="level2">
+<h2 class="anchored" data-anchor-id="компрессия-как-бонус-от-колонок">Компрессия как бонус от колонок</h2>
+<p>Когда значения одной колонки лежат подряд, они однотипны: один тип, часто узкий домен значений. Это <strong>открывает компрессию</strong>, которой при построчном хранении не было бы смысла — в строке рядом лежат <code>int</code> и <code>varchar</code>, общего сжатия нет. Базовые приёмы — именно те, что используют <code>ClickHouse</code>, <code>Parquet</code>, <code>ORC</code>.</p>
+<p><strong>Run-Length Encoding (RLE)</strong> — серии повторов:</p>
+<pre><code>[5, 5, 5, 5, 3, 3, 7]  →  [(5,4), (3,2), (7,1)]</code></pre>
+<p>Работает на отсортированных или низкокардинальных колонках: статусы, флаги.</p>
+<p><strong>Dictionary Encoding</strong> — словарь + индексы:</p>
+<pre><code>[USA, Germany, USA, France, Germany, USA]
+→ словарь {USA→0, Germany→1, France→2}
+→ индексы [0, 1, 0, 2, 1, 0]</code></pre>
+<p>Было: 6 × ~7 байт = <code>42 B</code>. Стало: словарь + 6 × 2 бита ≈ <code>23 B</code>. Подходит строковым колонкам низкой кардинальности: страны, категории, статусы.</p>
+<p><strong>Bit Packing</strong> — минимум бит под число:</p>
+<pre><code>[5, 12, 3, 15, 7]   // max = 15 → достаточно 4 бит
+было:  5 × 32 = 160 бит
+стало: 5 × 4  = 20 бит  (сжатие 8×)</code></pre>
+<p>Подходит числам в ограниченном диапазоне: возраст, рейтинг, маленькие счётчики.</p>
+<p><strong>Delta Encoding</strong> — хранить разности:</p>
+<pre><code>timestamps: [1704067200, 1704067260, 1704067320, 1704067380]
+→ база + дельты: [1704067200, +60, +60, +60]</code></pre>
+<p>Работает на монотонных последовательностях: <code>timestamp</code>, <code>auto_increment</code>, версии.</p>
+<p><strong>Frame of Reference (FOR)</strong> — вычесть минимум, потом bit-pack остатки:</p>
+<pre><code>[1005, 1012, 1003, 1015, 1007]
+min = 1003
+→ [2, 9, 0, 12, 4]   // помещается в 4 бита</code></pre>
+<p>На длинных однородных колонках типичная степень сжатия — от <code>3×</code> до <code>10×</code>. Это не просто экономия диска: колонка, пожатая в пять раз, читается с диска в пять раз быстрее, а декомпрессия обычно дешевле самого I/O.</p>
+</section>
+<section id="цена-записи-в-колоночной-раскладке" class="level2">
+<h2 class="anchored" data-anchor-id="цена-записи-в-колоночной-раскладке">Цена записи в колоночной раскладке</h2>
+<p>У поколоночного хранения есть зеркальная проблема. Одна строка физически размазана по N файлам — по одному на колонку. Отсюда:</p>
+<ul>
+<li><code>INSERT</code> одной строки — это N мелких записей;</li>
+<li><code>UPDATE</code> одной ячейки трогает отдельный файл колонки;</li>
+<li>транзакция на одну строку становится нелокальной.</li>
+</ul>
+<p>Поэтому колоночные базы почти никогда не тянут OLTP-стиль. Они <strong>пишут батчами</strong>, и обычно append-only, иммутабельными частями — как SSTable в LSM. Это не случайное сходство: <code>ClickHouse MergeTree</code> — это LSM над колонками. <code>UPDATE</code> и <code>DELETE</code> реализуются через новые версии строк + фоновая compaction, а не через правку на месте.</p>
+</section>
+<section id="oltp-vs-olap-как-следствие-раскладки" class="level2">
+<h2 class="anchored" data-anchor-id="oltp-vs-olap-как-следствие-раскладки">OLTP vs OLAP как следствие раскладки</h2>
+<p>Теперь можно назвать вещи своими именами.</p>
+<p><strong>OLTP (online transaction processing)</strong> — нагрузка вида «достать и изменить несколько строк по ключу»: заказ, корзина, профиль пользователя. Физика под неё — построчное хранение + heap или clustered + B-tree. Системы: <code>PostgreSQL</code>, <code>MySQL</code>, <code>Oracle</code>.</p>
+<p><strong>OLAP (online analytical processing)</strong> — нагрузка вида «пройти миллионы строк, агрегировать одну-две колонки, сгруппировать». Физика под неё — поколоночное хранение + компрессия + append-батчи. Системы: <code>ClickHouse</code>, <code>Vertica</code>, <code>Snowflake</code>, <code>Apache Druid</code>; форматы: <code>Parquet</code>, <code>ORC</code>.</p>
+<p>Ключевая мысль: <strong>OLTP и OLAP — не выбор свыше, а следствие физической раскладки</strong>. Построчное хранение дёшево обслуживает точечные операции и дорого — агрегации. Поколоночное — наоборот. Системы вырастают вокруг той нагрузки, которую их физика делает дешёвой.</p>
+</section>
+<section id="пример-маркетплейс" class="level2">
+<h2 class="anchored" data-anchor-id="пример-маркетплейс">Пример: маркетплейс</h2>
+<p>Один и тот же бизнес обычно держит обе стороны одновременно.</p>
+<p><strong>OLTP (транзакционные операции)</strong> — идут в <code>PostgreSQL</code>/<code>MySQL</code>:</p>
+<ul>
+<li>добавление товара в корзину: <code>INSERT INTO cart (user_id, product_id)</code>;</li>
+<li>подписка на продавца: <code>UPDATE users SET subscriptions = ...</code>;</li>
+<li>оформление заказа — транзакция из нескольких <code>INSERT</code>/<code>UPDATE</code>;</li>
+<li>проверка наличия товара: <code>SELECT stock FROM products WHERE id = 456</code>.</li>
+</ul>
+<p><strong>OLAP (аналитические события)</strong> — собираются батчами в <code>ClickHouse</code>/<code>Snowflake</code>:</p>
+<ul>
+<li>клики по экранам: <code>(user_id, screen, timestamp)</code>;</li>
+<li>время на странице: <code>(user_id, page_id, duration_sec)</code>;</li>
+<li>девайс: <code>(user_id, device_type, os, browser)</code>;</li>
+<li>просмотры товаров без покупки: <code>(user_id, product_id, timestamp)</code>.</li>
+</ul>
+<p>А потом на этих событиях считают:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Сколько пользователей iOS заходило в "Электронику" за неделю?</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> user_id)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="kw">events</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> screen <span class="op">=</span> <span class="st">'category_electronics'</span> <span class="kw">AND</span> os <span class="op">=</span> <span class="st">'iOS'</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">AND</span> <span class="dt">timestamp</span> <span class="op">&gt;</span> NOW() <span class="op">-</span> <span class="dt">INTERVAL</span> <span class="st">'7 days'</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Тот же запрос при построчном хранении положил бы базу; при поколоночном он дешёвый, потому что читает только <code>screen</code>, <code>os</code>, <code>timestamp</code>, <code>user_id</code> — а не всю запись события.</p>
 
 
 </section>
