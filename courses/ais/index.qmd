@@ -1,5 +1,5 @@
 ---
-title: "AIS: полный курс"
+title: "Архитектура Информационных Систем"
 format:
   html:
     toc: true
@@ -7,7 +7,9 @@ format:
     toc: true
 ---
 
-Сборная страница со всеми лекциями курса AIS. Доступна [версия для печати (PDF)](index.pdf).
+Сборная страница со всеми лекциями курса. Доступна [версия для печати (PDF)](index.pdf).
+
+::: {.content-visible when-format="typst"}
 
 ## Оглавление
 
@@ -51,6 +53,8 @@ format:
 **Дополнительно**
 
 - [Индексы: B-tree, hash и bitmap](indexes/index.qmd)
+
+:::
 
 ---
 
