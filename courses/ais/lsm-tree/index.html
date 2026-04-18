@@ -527,7 +527,7 @@ O(\log m + R)
 <li><strong>Чтение:</strong> B-tree за <span class="math inline">\(O(\log_B n)\)</span> попадает в нужный лист; LSM может обойти Memtable и несколько SSTable (Bloom Filter ускоряет, но не гарантирует).</li>
 <li><strong>Запись:</strong> LSM обычно быстрее — append-only в Memtable и последовательный flush, без read-modify-write узлов.</li>
 <li><strong>Стабильность:</strong> B-tree даёт предсказуемую задержку; у LSM бывают всплески из-за компакции.</li>
-<li><strong>Итого:</strong> B-tree для OLTP и low-latency чтений; LSM для write-heavy и time-series.</li>
+<li><strong>Итого:</strong> B-tree для OLTP и чтений с низкой задержкой; LSM для нагрузок с преобладанием записи и временных рядов.</li>
 </ul>
 </section>
 <section id="lsm-vs-hash" class="level3">
@@ -542,7 +542,7 @@ O(\log m + R)
 <h2 class="anchored" data-anchor-id="практическое-применение">Практическое применение</h2>
 <p>Хорошо подходит:</p>
 <ul>
-<li>частые вставки и обновления по ключу (write-heavy нагрузки);</li>
+<li>частые вставки и обновления по ключу (нагрузки с преобладанием записи);</li>
 <li>пакетные записи и стриминг событий;</li>
 <li>диапазонные запросы по ключу;</li>
 <li>чтение свежих данных, где важна скорость записи и допустима амортизированная задержка.</li>
@@ -572,7 +572,7 @@ O(\log m + R)
 </tr>
 <tr class="even">
 <td>Cassandra</td>
-<td>write-heavy нагрузки, time-series, распределённые логи</td>
+<td>нагрузки с преобладанием записи, временные ряды, распределённые логи</td>
 </tr>
 <tr class="odd">
 <td>HBase</td>
@@ -584,7 +584,7 @@ O(\log m + R)
 </tr>
 <tr class="odd">
 <td>InfluxDB</td>
-<td>time-series: постоянный поток метрик, редкие обновления</td>
+<td>временные ряды: постоянный поток метрик, редкие обновления</td>
 </tr>
 </tbody>
 </table>

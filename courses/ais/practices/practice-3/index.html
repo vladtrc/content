@@ -193,7 +193,7 @@ window.Quarto = {
   <li><a href="#задача-2.-описание-endpointа" id="toc-задача-2.-описание-endpointа" class="nav-link" data-scroll-target="#задача-2.-описание-endpointа">Задача 2. Описание endpoint’а</a></li>
   <li><a href="#задача-3.-анализ-плана-выполнения" id="toc-задача-3.-анализ-плана-выполнения" class="nav-link" data-scroll-target="#задача-3.-анализ-плана-выполнения">Задача 3. Анализ плана выполнения</a></li>
   <li><a href="#задача-4.-влияние-индексов" id="toc-задача-4.-влияние-индексов" class="nav-link" data-scroll-target="#задача-4.-влияние-индексов">Задача 4. Влияние индексов</a></li>
-  <li><a href="#задача-5.-оценка-capacity" id="toc-задача-5.-оценка-capacity" class="nav-link" data-scroll-target="#задача-5.-оценка-capacity">Задача 5. Оценка capacity</a></li>
+  <li><a href="#задача-5.-оценка-пропускной-способности" id="toc-задача-5.-оценка-пропускной-способности" class="nav-link" data-scroll-target="#задача-5.-оценка-пропускной-способности">Задача 5. Оценка пропускной способности</a></li>
   </ul></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Другие форматы</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>Typst</a></li></ul></div></nav>
@@ -233,9 +233,9 @@ window.Quarto = {
 <li><strong>Спроектируете схему данных</strong> для вашей системы</li>
 <li><strong>Увидите, как PostgreSQL выполняет запросы</strong> через EXPLAIN ANALYZE</li>
 <li><strong>Сравните поведение разных индексов</strong> (hash vs B-tree)</li>
-<li><strong>Оцените capacity</strong> на основе реальных замеров и Little’s Law</li>
+<li><strong>Оцените пропускную способность</strong> на основе реальных замеров и Little’s Law</li>
 </ol>
-<p><strong>Контекст:</strong> в Практике 2 вы реализовали приложение на Clean Architecture с in-memory репозиториями. Здесь вы впервые работаете с реальной БД — напрямую через psql / DBeaver / DataGrip, без прикладного кода. Цель — понять, как работает хранилище изнутри, прежде чем подключать его к приложению.</p>
+<p><strong>Контекст:</strong> в Практике 2 вы реализовали приложение на Clean Architecture с репозиториями в памяти. Здесь вы впервые работаете с реальной БД — напрямую через psql / DBeaver / DataGrip, без прикладного кода. Цель — понять, как работает хранилище изнутри, прежде чем подключать его к приложению.</p>
 </section>
 <section id="задачи-практики" class="level2">
 <h2 class="anchored" data-anchor-id="задачи-практики">Задачи практики</h2>
@@ -246,8 +246,8 @@ window.Quarto = {
 <li>Расчёт размера одной записи в байтах для основных сущностей</li>
 <li>Оценка общего объёма данных при целевой нагрузке</li>
 </ul>
-<p><strong>Задача 2. Описание одного endpoint’а из Практики 2</strong></p>
-<p>Выберите один write-heavy endpoint и детально опишите:</p>
+<p><strong>Задача 2. Описание одного эндпоинта из Практики 2</strong></p>
+<p>Выберите один эндпоинт с преобладанием записи и детально опишите:</p>
 <ul>
 <li>Название и назначение endpoint’а</li>
 <li>Какие таблицы читаются/пишутся</li>
@@ -266,8 +266,8 @@ window.Quarto = {
 <p><strong>Задача 4. Влияние индексов</strong></p>
 <p>Выберите колонку <strong>без индекса</strong> (например, внешний ключ) и выполните два запроса:</p>
 <ul>
-<li>Point query: <code>WHERE col = X</code></li>
-<li>Range query: <code>WHERE col BETWEEN X AND Y</code></li>
+<li>Точечный запрос: <code>WHERE col = X</code></li>
+<li>Диапазонный запрос: <code>WHERE col BETWEEN X AND Y</code></li>
 </ul>
 <p>Сравните три сценария:</p>
 <ol type="1">
@@ -277,7 +277,7 @@ window.Quarto = {
 </ol>
 <p>Для каждого сценария зафиксируйте: тип узла, buffers hit/read, время.</p>
 <p>Вывод: объясните, <strong>почему</strong> hash-индекс ускоряет только point query (хеш-функция теряет порядок ключей), а B-tree — оба типа запросов (упорядоченное дерево позволяет обход диапазона). Свяжите с лекцией про внутреннюю структуру B-tree.</p>
-<p><strong>Задача 5. Оценка capacity</strong></p>
+<p><strong>Задача 5. Оценка пропускной способности</strong></p>
 <p>Примените Little’s Law к реальным замерам из задачи 3:</p>
 <p><span class="math display">\[ \lambda = L / W \]</span></p>
 <p>Где:</p>
@@ -292,12 +292,12 @@ window.Quarto = {
 <li>Из EXPLAIN ANALYZE (задача 3) возьмите суммарное <span class="math inline">\(W\)</span> транзакции</li>
 <li>Задайте <span class="math inline">\(L\)</span> — размер пула соединений (обоснуйте выбор)</li>
 <li>Переведите <span class="math inline">\(\lambda\)</span> → DAU по формуле из лекции «Классификация нагрузки»</li>
-<li>Напишите 2-3 предложения: какие факторы могут изменить оценку в обе стороны (кэш, connection pooling, lock contention, добавление индексов)</li>
+<li>Напишите 2-3 предложения: какие факторы могут изменить оценку в обе стороны (кэш, пул соединений, конкуренция за блокировки, добавление индексов)</li>
 </ol>
 </section>
 <section id="пример-выполнения" class="level2">
 <h2 class="anchored" data-anchor-id="пример-выполнения">Пример выполнения</h2>
-<p><strong>Сценарий:</strong> интернет-магазин (e-commerce)</p>
+<p><strong>Сценарий:</strong> интернет-магазин</p>
 </section>
 <section id="задача-1.-модель-данных" class="level2">
 <h2 class="anchored" data-anchor-id="задача-1.-модель-данных">Задача 1. Модель данных</h2>
@@ -596,8 +596,8 @@ EXPLAIN (ANALYZE, BUFFERS)
 </table>
 <p><strong>Вывод:</strong> hash-индекс <span class="math inline">\(cal(O)(1)\)</span> для equality, но бесполезен для диапазонов — хеш-функция разрушает порядок ключей. B-tree <span class="math inline">\(cal(O)(\log_B n)\)</span> для обоих типов — упорядоченная структура позволяет обход диапазона по связанным листовым узлам.</p>
 </section>
-<section id="задача-5.-оценка-capacity" class="level2">
-<h2 class="anchored" data-anchor-id="задача-5.-оценка-capacity">Задача 5. Оценка capacity</h2>
+<section id="задача-5.-оценка-пропускной-способности" class="level2">
+<h2 class="anchored" data-anchor-id="задача-5.-оценка-пропускной-способности">Задача 5. Оценка пропускной способности</h2>
 <p><strong>Суммарное время транзакции</strong> (из задачи 3): <span class="math inline">\(W \approx 0.9\)</span> мс <span class="math inline">\(= 0.0009\)</span> с.</p>
 <p><strong>Пул соединений:</strong> PgBouncer, pool_size = 20 (типичный выбор для OLTP-системы среднего размера — меньше нагрузка на PostgreSQL, достаточно для сотен клиентских соединений через мультиплексирование):</p>
 <p><span class="math display">\[ L = 20 \]</span></p>

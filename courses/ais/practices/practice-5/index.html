@@ -193,32 +193,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Практика 5: Операционные компоненты + OLAP</h1>
 <section id="предисловие" class="level2">
 <h2 class="anchored" data-anchor-id="предисловие">Предисловие</h2>
-<p>Написать работающий код — только половина задачи. Продакшн-система требует операционных компонентов: защита от перегрузки (rate limiting), распределение нагрузки (load balancing), безопасность (аутентификация/авторизация), наблюдаемость (метрики, логи, трейсы). Также большинство систем нуждаются в аналитике — а это требует отдельного OLAP-хранилища и ETL-пайплайнов.</p>
+<p>Написать работающий код — только половина задачи. Продакшн-система требует операционных компонентов: защита от перегрузки (ограничение частоты запросов), распределение нагрузки (балансировка нагрузки), безопасность (аутентификация/авторизация), наблюдаемость (метрики, логи, трейсы). Также большинство систем нуждаются в аналитике — а это требует отдельного OLAP-хранилища и ETL-пайплайнов.</p>
 </section>
 <section id="задание" class="level2">
 <h2 class="anchored" data-anchor-id="задание">Задание</h2>
 <p>Дополните вашу OLTP-систему из Практики 3 <strong>операционными компонентами</strong>:</p>
-<p><strong>Часть 1: Rate Limiting и Load Balancing</strong></p>
+<p><strong>Часть 1: Ограничение частоты запросов и балансировка нагрузки</strong></p>
 <ol type="1">
-<li><strong>Rate Limiting:</strong>
+<li><strong>Ограничение частоты запросов:</strong>
 <ul>
 <li>Выберите алгоритм: Token Bucket, Sliding Window Log, Sliding Window Counter</li>
 <li>Определите лимиты: для авторизованных и неавторизованных пользователей</li>
 <li>Обоснуйте выбор</li>
 </ul></li>
-<li><strong>Load Balancing:</strong>
+<li><strong>Балансировка нагрузки:</strong>
 <ul>
 <li>Предположим, у вас 3 инстанса приложения</li>
 <li>Выберите алгоритм: Round Robin, Least Connections, IP Hash, Consistent Hashing</li>
 <li>Обоснуйте выбор</li>
 </ul></li>
 </ol>
-<p><strong>Часть 2: Security</strong></p>
+<p><strong>Часть 2: Безопасность</strong></p>
 <ol type="1">
 <li><strong>Аутентификация:</strong>
 <ul>
-<li>Выберите механизм: JWT, Session-based, OAuth 2.0</li>
-<li>Опишите flow (последовательность запросов)</li>
+<li>Выберите механизм: JWT, сессии, OAuth 2.0</li>
+<li>Опишите последовательность запросов</li>
 </ul></li>
 <li><strong>Авторизация:</strong>
 <ul>
@@ -226,7 +226,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Определите роли/права для вашего сценария</li>
 </ul></li>
 </ol>
-<p><strong>Часть 3: Observability</strong></p>
+<p><strong>Часть 3: Наблюдаемость</strong></p>
 <ol type="1">
 <li><strong>Метрики (Prometheus):</strong>
 <ul>
@@ -236,7 +236,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul></li>
 <li><strong>Логирование:</strong>
 <ul>
-<li>Определите формат: structured JSON</li>
+<li>Определите формат: структурированный JSON</li>
 <li>Какие поля включать (timestamp, level, user_id, trace_id, etc.)</li>
 </ul></li>
 <li><strong>Трассировка:</strong>
@@ -250,11 +250,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li>Какие отчёты нужны? (например: топ-товары, динамика продаж, RFM-анализ клиентов)</li>
 </ul></li>
-<li><strong>ETL Pipeline:</strong>
+<li><strong>ETL-конвейер:</strong>
 <ul>
 <li>Как передавать данные из OLTP (PostgreSQL) в OLAP (ClickHouse)?</li>
-<li>Выберите инструмент: Airflow, dbt, custom script</li>
-<li>Опишите schedule (real-time, hourly, daily?)</li>
+<li>Выберите инструмент: Airflow, dbt, собственный скрипт</li>
+<li>Опишите периодичность (в реальном времени, раз в час, раз в день?)</li>
 </ul></li>
 <li><strong>Расчёт объёма:</strong>
 <ul>
@@ -267,8 +267,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="пример" class="level2">
 <h2 class="anchored" data-anchor-id="пример">Пример</h2>
-<p><strong>Часть 1: Rate Limiting и Load Balancing</strong></p>
-<p><strong>1. Rate Limiting</strong></p>
+<p><strong>Часть 1: Ограничение частоты запросов и балансировка нагрузки</strong></p>
+<p><strong>1. Ограничение частоты запросов</strong></p>
 <p><strong>Алгоритм: Token Bucket</strong></p>
 <p>Лимиты:</p>
 <pre><code>- Неавторизованные пользователи: 10 req/min (защита от парсеров)
@@ -277,7 +277,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 - Админы: без лимита</code></pre>
 <p>Конфигурация (nginx):</p>
 <pre class="nginx"><code>http {
-    # Зона для rate limiting
+    # Зона для ограничения частоты запросов
     limit_req_zone $binary_remote_addr zone=general:10m rate=10r/m;
     limit_req_zone $user_id zone=authenticated:10m rate=100r/m;
 
@@ -295,11 +295,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</code></pre>
 <p><strong>Обоснование Token Bucket:</strong></p>
 <ul>
-<li>Позволяет burst (всплески): пользователь может сделать 20 быстрых запросов, потом ограничение</li>
+<li>Позволяет кратковременные всплески: пользователь может сделать 20 быстрых запросов, потом ограничение</li>
 <li>Простая реализация в nginx/Redis</li>
 <li>Sliding Window Log был бы точнее, но избыточен</li>
 </ul>
-<p><strong>2. Load Balancing</strong></p>
+<p><strong>2. Балансировка нагрузки</strong></p>
 <p><strong>Алгоритм: Least Connections</strong></p>
 <p>Конфигурация (nginx):</p>
 <pre class="nginx"><code>upstream backend {
@@ -321,11 +321,11 @@ server {
 <li>Запросы неравномерные: создание заказа (долгий) vs просмотр товара (быстрый)</li>
 <li>Least Connections автоматически учитывает загруженность</li>
 <li>Round Robin не учитывает нагрузку — может перегрузить один сервер</li>
-<li>IP Hash не нужен (нет sticky sessions)</li>
+<li>IP Hash не нужен (нет привязки сессии к серверу)</li>
 </ul>
 <p><strong>Часть 2: Security</strong></p>
 <p><strong>1. Аутентификация: JWT</strong></p>
-<p><strong>Flow:</strong></p>
+<p><strong>Последовательность запросов:</strong></p>
 <pre><code>1. POST /auth/login {email, password}
    → Сервер проверяет пароль
    → Возвращает JWT: {user_id, roles, exp}
@@ -350,9 +350,9 @@ server {
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
 <p><strong>Обоснование:</strong></p>
 <ul>
-<li>Stateless: не нужно хранить сессии в Redis/БД</li>
+<li>Без хранения состояния на сервере: не нужно держать сессии в Redis/БД</li>
 <li>Масштабируемость: любой инстанс может проверить JWT</li>
-<li>Session-based требует централизованное хранилище (Redis)</li>
+<li>Модель на сессиях требует централизованное хранилище (Redis)</li>
 </ul>
 <p><strong>2. Авторизация: RBAC</strong></p>
 <p><strong>Роли:</strong></p>
@@ -389,7 +389,7 @@ server {
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>router<span class="op">.</span>GET<span class="op">(</span><span class="st">"/orders"</span><span class="op">,</span> RequirePermission<span class="op">(</span>ReadAllOrders<span class="op">),</span> listAllOrders<span class="op">)</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
 <p><strong>Обоснование RBAC:</strong></p>
 <ul>
-<li>Простая модель для типичного e-commerce</li>
+<li>Простая модель для типичного интернет-магазина</li>
 <li>Роли статичны (customer, admin)</li>
 <li>ABAC избыточен (не нужны динамические правила вроде “только в рабочее время”)</li>
 </ul>
@@ -533,11 +533,11 @@ topk(5,
 <li><strong>Конверсия корзины</strong> (% пользователей, совершивших заказ)</li>
 <li><strong>AOV</strong> (Average Order Value — средний чек)</li>
 </ul>
-<p><strong>2. ETL Pipeline (Airflow)</strong></p>
+<p><strong>2. ETL-конвейер (Airflow)</strong></p>
 <p><strong>Архитектура:</strong></p>
 <pre><code>PostgreSQL (OLTP)
     ↓ (каждый час)
-Airflow DAG: extract → transform → load
+Airflow DAG: извлечение → преобразование → загрузка
     ↓
 ClickHouse (OLAP)</code></pre>
 <p><strong>Airflow DAG:</strong></p>
@@ -580,10 +580,10 @@ ClickHouse (OLAP)</code></pre>
 <span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>load_task <span class="op">=</span> PythonOperator(task_id<span class="op">=</span><span class="st">'load'</span>, python_callable<span class="op">=</span>load_to_clickhouse, dag<span class="op">=</span>dag)</span>
 <span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>extract_task <span class="op">&gt;&gt;</span> transform_task <span class="op">&gt;&gt;</span> load_task</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>Schedule:</strong></p>
+<p><strong>Периодичность:</strong></p>
 <ul>
-<li><strong>Hourly</strong> для оперативных дашбордов (динамика продаж в реальном времени)</li>
-<li><strong>Daily</strong> для тяжёлых агрегаций (RFM-анализ)</li>
+<li><strong>Раз в час</strong> для оперативных дашбордов (динамика продаж в реальном времени)</li>
+<li><strong>Раз в день</strong> для тяжёлых агрегаций (RFM-анализ)</li>
 </ul>
 <p><strong>3. Расчёт объёма</strong></p>
 <p>Данные в день:</p>
@@ -594,7 +594,7 @@ ClickHouse (OLAP)</code></pre>
 <ul>
 <li>Колоночный формат (оптимален для ClickHouse)</li>
 <li>Встроенная компрессия (zstd)</li>
-<li>Эффективно для батчинга (hourly loads)</li>
+<li>Эффективно для пакетной загрузки раз в час</li>
 </ul>
 <p>Компрессия:</p>
 <pre><code>2 МБ (raw) → ~0.5 МБ (Parquet + zstd)</code></pre>
@@ -625,7 +625,7 @@ ClickHouse (OLAP)</code></pre>
 <span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
 <p><strong>Итого:</strong></p>
 <ul>
-<li>OLTP → OLAP: hourly через Airflow</li>
+<li>OLTP → OLAP: раз в час через Airflow</li>
 <li>Формат: Parquet (колоночный + компрессия)</li>
 <li>Объём: ~0.5 МБ/день → 182 МБ/год (легко масштабируется)</li>
 </ul>

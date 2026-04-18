@@ -324,9 +324,9 @@ window.Quarto = {
 </section>
 <section id="характеристики-нагрузки" class="level2">
 <h2 class="anchored" data-anchor-id="характеристики-нагрузки">Характеристики нагрузки</h2>
-<p><strong>Read/Write ratio:</strong> - <strong>90/10</strong> — преобладание чтения: кэширование, CDN, статический контент - <strong>50/50</strong> — сбалансированная: социальные сети, e-commerce - <strong>10/90</strong> — преобладание записи: логирование, IoT, метрики</p>
+<p><strong>Read/Write ratio:</strong> - <strong>90/10</strong> — преобладание чтения: кэширование, CDN, статический контент - <strong>50/50</strong> — сбалансированная: социальные сети, интернет-магазины - <strong>10/90</strong> — преобладание записи: логирование, IoT, метрики</p>
 <p><strong>Размер записи:</strong> - <strong>&lt; 1 KB</strong> — Метаданные, Сессия, счётчики - <strong>1-100 KB</strong> — JSON-документы, профили пользователей - <strong>100 KB - 1 MB</strong> — статьи, посты с изображениями - <strong>&gt; 1 MB</strong> — медиафайлы, бинарные данные</p>
-<p><strong>Паттерн доступа:</strong> - <strong>random</strong> — point lookup по ключу, случайные запросы - <strong>sequential</strong> — range scan, time-series, логи</p>
+<p><strong>Паттерн доступа:</strong> - <strong>random</strong> — point lookup по ключу, случайные запросы - <strong>sequential</strong> — последовательное чтение, временные ряды, логи</p>
 <p><strong>Требования к латентности:</strong> - <strong>p50 &lt; 50 мс</strong> — медиана, типичный пользовательский опыт - <strong>p99 &lt; 200 мс</strong> — 1% худших запросов, важно для SLA - <strong>p999 &lt; 1 с</strong> — 0.1% худших, критично для финтеха</p>
 <p>Почему p99 важнее среднего: если p99 = 500 мс при 10000 QPS, то 100 запросов в секунду будут медленными — это 8.6 млн медленных запросов в сутки.</p>
 </section>
@@ -401,7 +401,7 @@ window.Quarto = {
 <p>Как связать время запроса с пропускной способностью? <strong>Little’s Law</strong> — фундаментальный закон теории очередей:</p>
 <p><span class="math display">\[L = \lambda \times W\]</span></p>
 <p>Где <span class="math inline">\(L\)</span> — среднее число запросов в системе (concurrency), <span class="math inline">\(\lambda\)</span> — throughput (RPS), <span class="math inline">\(W\)</span> — среднее время обработки.</p>
-<p><strong>Применение для capacity planning:</strong> - Знаем <span class="math inline">\(W\)</span> (время запроса) и <span class="math inline">\(L\)</span> (число ядер) → находим <span class="math inline">\(\lambda\)</span> (max RPS) - Знаем <span class="math inline">\(\lambda\)</span> (целевой RPS) и <span class="math inline">\(L\)</span> → находим требуемое <span class="math inline">\(W\)</span></p>
+<p><strong>Применение для планирования пропускной способности:</strong> - Знаем <span class="math inline">\(W\)</span> (время запроса) и <span class="math inline">\(L\)</span> (число ядер) → находим <span class="math inline">\(\lambda\)</span> (max RPS) - Знаем <span class="math inline">\(\lambda\)</span> (целевой RPS) и <span class="math inline">\(L\)</span> → находим требуемое <span class="math inline">\(W\)</span></p>
 <p><strong>Пример:</strong> сервер с 28 ядрами, время запроса 1 мс: <span class="math display">\[\lambda = L / W = 28 / 0.001 = 28000 \text{ RPS (теоретический максимум)}\]</span></p>
 <p><strong>Реальность:</strong> накладные расходы (context switching, lock contention, GC) снижают эффективность. Коэффициент полезной работы — 0.3–0.5: <span class="math display">\[\lambda_\text{реальный} = 28000 \times 0.4 \approx 11000 \text{ RPS}\]</span></p>
 </section>

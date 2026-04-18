@@ -197,7 +197,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>После того как система защищена и запущена в продакшене, возникает вопрос: <strong>как понять, что происходит внутри?</strong></p>
 <p>Когда приложение работает на вашем компьютере, вы видите вывод в консоль, можете поставить breakpoint и посмотреть переменные. Но в продакшене приложение работает на сервере, обрабатывает тысячи запросов в секунду, и вы не можете просто «остановить и посмотреть». Более того, если пользователь жалуется «у меня не работает», вам нужно понять, <strong>что именно</strong> пошло не так, <strong>когда</strong> это произошло и <strong>почему</strong>.</p>
 <p><strong>Observability</strong> (наблюдаемость) — это способность понять внутреннее состояние системы по её внешним выходным данным. Три столпа observability — это <strong>логи</strong> (что произошло), <strong>метрики</strong> (сколько и как быстро) и <strong>трейсы</strong> (путь запроса через систему).</p>
-<p>Эта лекция также охватывает <strong>планирование задач</strong> (task scheduling) — механизмы запуска фоновых задач и построения data pipelines. В продакшене многие операции выполняются асинхронно: отправка email, обработка загруженных файлов, построение отчётов. Вместо того чтобы заставлять пользователя ждать, мы ставим задачу в очередь и обрабатываем её фоном. Celery, Airflow и Dagster решают эту проблему на разных уровнях абстракции.</p>
+<p>Эта лекция также охватывает <strong>планирование задач</strong> — механизмы запуска фоновых задач и построения конвейеров обработки данных. В продакшене многие операции выполняются асинхронно: отправка email, обработка загруженных файлов, построение отчётов. Вместо того чтобы заставлять пользователя ждать, мы ставим задачу в очередь и обрабатываем её фоном. Celery, Airflow и Dagster решают эту проблему на разных уровнях абстракции.</p>
 <section id="три-столпа-observability" class="level2">
 <h2 class="anchored" data-anchor-id="три-столпа-observability">Три столпа Observability</h2>
 <p><strong>Логи (Logs):</strong> дискретные события (“user123 logged in at 14:30”)</p>
@@ -256,7 +256,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="prometheus-сбор-метрик" class="level2">
 <h2 class="anchored" data-anchor-id="prometheus-сбор-метрик">Prometheus: сбор метрик</h2>
-<p><strong>Что это:</strong> time-series база данных для метрик. Scraping-based (Prometheus сам забирает метрики из приложений).</p>
+<p><strong>Что это:</strong> база данных временных рядов для метрик. Prometheus сам забирает метрики из приложений по pull-модели.</p>
 <p><strong>Типы метрик:</strong></p>
 <ol type="1">
 <li><p><strong>Counter</strong> — монотонно растущий счётчик (сбрасывается при рестарте)</p>
@@ -467,7 +467,7 @@ Span 1: API Gateway (245ms total)
 <span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Асинхронно (возвращает сразу):</span></span>
 <span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> send_email.delay(<span class="st">"alice@example.com"</span>, <span class="st">"Hello"</span>, <span class="st">"Welcome!"</span>)</span>
 <span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a><span class="co"># result.id → task ID для отслеживания</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>Use cases:</strong></p>
+<p><strong>Сценарии использования:</strong></p>
 <ul>
 <li>Отправка email/SMS после регистрации</li>
 <li>Генерация отчётов (PDF, Excel)</li>
@@ -483,8 +483,8 @@ Span 1: API Gateway (245ms total)
 <span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">'schedule'</span>: crontab(hour<span class="op">=</span><span class="dv">2</span>, minute<span class="op">=</span><span class="dv">0</span>),  <span class="co"># каждый день в 02:00</span></span>
 <span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    },</span>
 <span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>2. Airflow (workflow orchestration)</strong></p>
-<p><strong>Что это:</strong> платформа для создания, планирования и мониторинга <strong>DAG</strong> (Directed Acyclic Graphs) — data pipelines.</p>
+<p><strong>2. Airflow (оркестрация рабочих процессов)</strong></p>
+<p><strong>Что это:</strong> платформа для создания, планирования и мониторинга <strong>DAG</strong> (Directed Acyclic Graphs) — конвейеров обработки данных.</p>
 <p><strong>Пример DAG:</strong></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> airflow <span class="im">import</span> DAG</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> airflow.operators.python <span class="im">import</span> PythonOperator</span>
@@ -517,17 +517,17 @@ Span 1: API Gateway (245ms total)
 <pre><code>[Extract] → [Transform] → [Load]
      ↓           ↓            ↓
   Success    Success      Success</code></pre>
-<p><strong>Use cases:</strong></p>
+<p><strong>Сценарии использования:</strong></p>
 <ul>
-<li>ETL/ELT pipelines (данные из источников → обработка → хранилище)</li>
-<li>ML training pipelines (подготовка данных → обучение → деплой модели)</li>
+<li>ETL/ELT-конвейеры (данные из источников → обработка → хранилище)</li>
+<li>ML-конвейеры обучения (подготовка данных → обучение → развёртывание модели)</li>
 <li>Бэкапы и синхронизация данных</li>
 </ul>
-<p><strong>3. Dagster (data orchestrator)</strong></p>
-<p><strong>Что это:</strong> современная альтернатива Airflow с фокусом на <strong>software-defined assets</strong>.</p>
+<p><strong>3. Dagster (оркестратор данных)</strong></p>
+<p><strong>Что это:</strong> современная альтернатива Airflow с фокусом на <strong>ресурсы, описанные в коде</strong>.</p>
 <p><strong>Отличие от Airflow:</strong></p>
 <ul>
-<li><strong>Airflow:</strong> описываем <strong>задачи</strong> (tasks)</li>
+<li><strong>Airflow:</strong> описываем <strong>задачи</strong></li>
 <li><strong>Dagster:</strong> описываем <strong>ресурсы</strong> (assets) и их зависимости</li>
 </ul>
 <p><strong>Пример:</strong></p>
@@ -553,11 +553,11 @@ Span 1: API Gateway (245ms total)
 <li>Автоматическое кеширование (не пересчитываем, если данные не изменились)</li>
 <li>Встроенный data lineage (откуда данные?)</li>
 </ul>
-<p><strong>Use cases:</strong></p>
+<p><strong>Сценарии использования:</strong></p>
 <ul>
-<li>Современные data pipelines</li>
-<li>ML pipelines с версионированием данных</li>
-<li>Real-time + batch обработка</li>
+<li>Современные конвейеры обработки данных</li>
+<li>ML-конвейеры с версионированием данных</li>
+<li>Обработка в реальном времени + пакетная обработка</li>
 </ul>
 <p><strong>Сравнение планировщиков:</strong></p>
 <table class="caption-top table">
@@ -578,15 +578,15 @@ Span 1: API Gateway (245ms total)
 <tbody>
 <tr class="odd">
 <td>Тип</td>
-<td>Task queue</td>
-<td>Workflow orchestrator</td>
-<td>Data orchestrator</td>
+<td>Очередь задач</td>
+<td>Оркестратор рабочих процессов</td>
+<td>Оркестратор данных</td>
 </tr>
 <tr class="even">
 <td>Фокус</td>
 <td>Асинхронные задачи</td>
-<td>ETL/batch pipelines</td>
-<td>Data assets + lineage</td>
+<td>ETL и пакетные конвейеры</td>
+<td>Ресурсы данных и lineage</td>
 </tr>
 <tr class="odd">
 <td>Сложность</td>
@@ -609,8 +609,8 @@ Span 1: API Gateway (245ms total)
 <tr class="even">
 <td>Когда использовать</td>
 <td>Фоновые задачи в веб-приложениях</td>
-<td>Data pipelines, ETL</td>
-<td>Современные data pipelines, ML</td>
+<td>Конвейеры обработки данных, ETL</td>
+<td>Современные конвейеры обработки данных, ML</td>
 </tr>
 </tbody>
 </table>

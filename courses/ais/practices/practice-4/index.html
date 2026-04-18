@@ -193,12 +193,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Практика 4: Специализированные индексы и поиск</h1>
 <section id="предисловие" class="level2">
 <h2 class="anchored" data-anchor-id="предисловие">Предисловие</h2>
-<p>Классические индексы (B-tree, hash) оптимизированы для точного поиска по ключу. Но многие задачи требуют <em>поиска похожих элементов</em>: текстовый поиск по словам, рекомендации по семантической близости, геопоиск “рядом со мной”. Для этих задач используются специализированные структуры данных: Inverted Index, векторные индексы (HNSW, LSH), пространственные индексы (R-Tree).</p>
+<p>Классические индексы (B-tree, hash) оптимизированы для точного поиска по ключу. Но многие задачи требуют <em>поиска похожих элементов</em>: текстовый поиск по словам, рекомендации по семантической близости, геопоиск “рядом со мной”. Для этих задач используются специализированные структуры данных: инвертированный индекс, векторные индексы (HNSW, LSH), пространственные индексы (R-Tree).</p>
 </section>
 <section id="задание" class="level2">
 <h2 class="anchored" data-anchor-id="задание">Задание</h2>
 <p>Для вашего варианта добавьте <strong>три типа поиска</strong>:</p>
-<p><strong>1. Полнотекстовый поиск (Inverted Index)</strong></p>
+<p><strong>1. Полнотекстовый поиск (инвертированный индекс)</strong></p>
 <p>Реализуйте поиск по одному из:</p>
 <ul>
 <li>Интернет-магазин: поиск товаров по названию и описанию</li>
@@ -208,12 +208,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p><strong>Требования:</strong></p>
 <ul>
-<li>Опишите структуру inverted index (term → list of documents)</li>
+<li>Опишите структуру инвертированного индекса (термин → список документов)</li>
 <li>Покажите пример запроса (AND/OR терминов)</li>
-<li>Выберите решение: PostgreSQL full-text search, Elasticsearch, или custom</li>
+<li>Выберите решение: PostgreSQL full-text search, Elasticsearch или собственную реализацию</li>
 <li>Обоснуйте выбор</li>
 </ul>
-<p><strong>2. Векторный поиск (Embeddings + ANN)</strong></p>
+<p><strong>2. Векторный поиск (эмбеддинги + ANN)</strong></p>
 <p>Реализуйте семантический поиск:</p>
 <ul>
 <li>Интернет-магазин: “похожие товары” по описанию</li>
@@ -224,7 +224,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>Требования:</strong></p>
 <ul>
 <li>Опишите, как создаются эмбеддинги (модель: BERT, sentence-transformers)</li>
-<li>Выберите метрику близости: cosine similarity, L2, dot product</li>
+<li>Выберите метрику близости: косинусное сходство, L2, скалярное произведение</li>
 <li>Выберите ANN-индекс: HNSW, LSH, IVF</li>
 <li>Оцените размер индекса (число векторов × размерность × 4 байта)</li>
 </ul>
@@ -237,7 +237,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>Требования:</strong></p>
 <ul>
 <li>Выберите структуру: R-Tree, QuadTree, KD-Tree</li>
-<li>Покажите пример запроса (range query, kNN)</li>
+<li>Покажите пример запроса (по диапазону, k ближайших соседей)</li>
 <li>Обоснуйте выбор</li>
 </ul>
 <p><strong>Формат ответа:</strong> документ с описанием каждого типа поиска, примерами запросов и обоснованиями.</p>
@@ -247,7 +247,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>1. Полнотекстовый поиск товаров</strong></p>
 <p><strong>Задача:</strong> пользователь вводит “беспроводные наушники bluetooth”, нужно найти релевантные товары.</p>
 <p><strong>Решение: PostgreSQL Full-Text Search</strong></p>
-<p>Создание inverted index:</p>
+<p>Создание инвертированного индекса:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Добавляем tsvector колонку для поиска</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> <span class="kw">TABLE</span> products <span class="kw">ADD</span> <span class="kw">COLUMN</span> search_vector tsvector;</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -312,22 +312,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>Метрики:</strong></p>
 <ul>
 <li>Размерность: 768</li>
-<li>Метрика: <strong>cosine similarity</strong> (через <code>vector_cosine_ops</code>)
+<li>Метрика: <strong>косинусное сходство</strong> (через <code>vector_cosine_ops</code>)
 <ul>
 <li>Обоснование: длина вектора не важна, важен только смысл описания</li>
 </ul></li>
 <li>Индекс: <strong>HNSW</strong> (Hierarchical Navigable Small World)
 <ul>
-<li>Recall ~95%, latency ~1-5 мс для 100k векторов</li>
+<li>Полнота ~95%, задержка ~1-5 мс для 100k векторов</li>
 </ul></li>
 </ul>
 <p><strong>Оценка размера:</strong></p>
 <pre><code>100,000 товаров × 768 dim × 4 байта = 307 МБ
-HNSW индекс добавляет ~2× overhead = 614 МБ
+HNSW индекс добавляет ~2× накладных расходов = 614 МБ
 Итого: ~1 ГБ (легко помещается в RAM)</code></pre>
 <p><strong>Альтернативы:</strong></p>
 <ul>
-<li>❌ <strong>LSH</strong>: хуже recall (~80%), но быстрее. Не нужно для 100k векторов.</li>
+<li>❌ <strong>LSH</strong>: хуже полнота (~80%), но быстрее. Не нужно для 100k векторов.</li>
 <li>❌ <strong>Faiss</strong> (Facebook AI Similarity Search): избыточно, pgvector достаточно</li>
 </ul>
 <p><strong>3. Геопоиск пунктов выдачи</strong></p>
@@ -351,7 +351,7 @@ HNSW индекс добавляет ~2× overhead = 614 МБ
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> pickup_points</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> location <span class="op">&lt;-&gt;</span> ST_MakePoint(<span class="fl">37.6173</span>, <span class="fl">55.7558</span>):<span class="ch">:geometry</span>  <span class="co">-- kNN оператор</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span>;</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Range query (все пункты в радиусе 5 км):</p>
+<p>Запрос по радиусу (все пункты в радиусе 5 км):</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">id</span>, name, address</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> pickup_points</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> ST_DWithin(</span>
@@ -362,7 +362,7 @@ HNSW индекс добавляет ~2× overhead = 614 МБ
 <p><strong>Обоснование R-Tree:</strong></p>
 <ul>
 <li>Оптимален для точек (пункты выдачи)</li>
-<li>Поддержка kNN и range queries</li>
+<li>Поддержка kNN и запросов по диапазону</li>
 <li>Встроен в PostGIS</li>
 </ul>
 <p><strong>Альтернативы:</strong></p>
