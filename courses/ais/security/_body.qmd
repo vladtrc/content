@@ -246,7 +246,7 @@ SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 
 **Сценарий:** приложение "PhotoEditor" хочет получить доступ к фотографиям пользователя в Google Drive.
 
-**Flow:**
+**Последовательность шагов:**
 ```
 1. Пользователь в PhotoEditor нажимает "Подключить Google Drive"
 
@@ -264,12 +264,12 @@ SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 4. Google перенаправляет обратно на PhotoEditor с authorization code:
    GET https://photoeditor.com/callback?code=AUTH_CODE_HERE
 
-5. PhotoEditor (backend) обменивает code на access token:
+5. PhotoEditor (серверная часть) обменивает code на access token:
    POST https://oauth2.googleapis.com/token
    {
      "code": "AUTH_CODE_HERE",
      "client_id": "...",
-     "client_secret": "...",  // секрет, известный только backend
+     "client_secret": "...",  // секрет, известный только серверной части
      "redirect_uri": "...",
      "grant_type": "authorization_code"
    }

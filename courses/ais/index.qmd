@@ -35,13 +35,13 @@ format:
 **Модуль 3. Методы поиска похожих/близких элементов**
 
 14. [Специализированные индексы для поиска](search-indexes/index.qmd)
-15. [Векторный поиск и embedding](embeddings/index.qmd)
+15. [Векторный поиск и эмбеддинги](embeddings/index.qmd)
 16. [Приближённый поиск ближайших соседей (ANN)](ann/index.qmd)
 17. [Геопространственные структуры](geo/index.qmd)
 
 **Модуль 4. Операционные компоненты**
 
-18. [Прокси и Rate Limiting](proxy-rate-limit/index.qmd)
+18. [Прокси и ограничение частоты запросов](proxy-rate-limit/index.qmd)
 19. [Безопасность и управление доступом](security/index.qmd)
 20. [Observability: логирование, мониторинг и планирование задач](observability/index.qmd)
 
