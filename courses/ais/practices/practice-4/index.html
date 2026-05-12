@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Практика 4: Специализированные индексы и поиск – prototype</title>
+<title>Практика 4: [Опционально] Расширение системы – prototype</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -155,11 +155,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Содержание</h2>
    
   <ul>
-  <li><a href="#практика-4-специализированные-индексы-и-поиск" id="toc-практика-4-специализированные-индексы-и-поиск" class="nav-link active" data-scroll-target="#практика-4-специализированные-индексы-и-поиск">Практика 4: Специализированные индексы и поиск</a>
+  <li><a href="#практика-4-опционально-расширение-системы" id="toc-практика-4-опционально-расширение-системы" class="nav-link active" data-scroll-target="#практика-4-опционально-расширение-системы">Практика 4: [Опционально] Расширение системы</a>
   <ul class="collapse">
-  <li><a href="#предисловие" id="toc-предисловие" class="nav-link" data-scroll-target="#предисловие">Предисловие</a></li>
-  <li><a href="#задание" id="toc-задание" class="nav-link" data-scroll-target="#задание">Задание</a></li>
-  <li><a href="#пример" id="toc-пример" class="nav-link" data-scroll-target="#пример">Пример</a></li>
+  <li><a href="#статус-практики" id="toc-статус-практики" class="nav-link" data-scroll-target="#статус-практики">Статус практики</a></li>
+  <li><a href="#что-можно-выбрать" id="toc-что-можно-выбрать" class="nav-link" data-scroll-target="#что-можно-выбрать">Что можно выбрать</a></li>
+  <li><a href="#протокол-отчёта" id="toc-протокол-отчёта" class="nav-link" data-scroll-target="#протокол-отчёта">Протокол отчёта</a>
+  <ul class="collapse">
+  <li><a href="#проблема" id="toc-проблема" class="nav-link" data-scroll-target="#проблема">1. Проблема</a></li>
+  <li><a href="#аналоги-и-варианты-решения" id="toc-аналоги-и-варианты-решения" class="nav-link" data-scroll-target="#аналоги-и-варианты-решения">2. Аналоги и варианты решения</a></li>
+  <li><a href="#выбранная-схема-для-вашей-системы" id="toc-выбранная-схема-для-вашей-системы" class="nav-link" data-scroll-target="#выбранная-схема-для-вашей-системы">3. Выбранная схема для вашей системы</a></li>
+  <li><a href="#реальные-структуры-данных" id="toc-реальные-структуры-данных" class="nav-link" data-scroll-target="#реальные-структуры-данных">4. Реальные структуры данных</a></li>
+  <li><a href="#цена-решения-и-ограничения" id="toc-цена-решения-и-ограничения" class="nav-link" data-scroll-target="#цена-решения-и-ограничения">5. Цена решения и ограничения</a></li>
+  <li><a href="#минимальный-план-внедрения" id="toc-минимальный-план-внедрения" class="nav-link" data-scroll-target="#минимальный-план-внедрения">6. Минимальный план внедрения</a></li>
+  </ul></li>
+  <li><a href="#что-сдаётся" id="toc-что-сдаётся" class="nav-link" data-scroll-target="#что-сдаётся">Что сдаётся</a></li>
+  <li><a href="#пример-1.-структурированные-логи-для-интернет-магазина" id="toc-пример-1.-структурированные-логи-для-интернет-магазина" class="nav-link" data-scroll-target="#пример-1.-структурированные-логи-для-интернет-магазина">Пример 1. Структурированные логи для интернет-магазина</a>
+  <ul class="collapse">
+  <li><a href="#проблема-1" id="toc-проблема-1" class="nav-link" data-scroll-target="#проблема-1">1. Проблема</a></li>
+  <li><a href="#аналоги" id="toc-аналоги" class="nav-link" data-scroll-target="#аналоги">2. Аналоги</a></li>
+  <li><a href="#схема-внедрения" id="toc-схема-внедрения" class="nav-link" data-scroll-target="#схема-внедрения">3. Схема внедрения</a></li>
+  <li><a href="#структуры-данных" id="toc-структуры-данных" class="nav-link" data-scroll-target="#структуры-данных">4. Структуры данных</a></li>
+  <li><a href="#цена-и-ограничения" id="toc-цена-и-ограничения" class="nav-link" data-scroll-target="#цена-и-ограничения">5. Цена и ограничения</a></li>
+  </ul></li>
+  <li><a href="#пример-2.-геопоиск-для-сервиса-доставки-еды" id="toc-пример-2.-геопоиск-для-сервиса-доставки-еды" class="nav-link" data-scroll-target="#пример-2.-геопоиск-для-сервиса-доставки-еды">Пример 2. Геопоиск для сервиса доставки еды</a>
+  <ul class="collapse">
+  <li><a href="#проблема-2" id="toc-проблема-2" class="nav-link" data-scroll-target="#проблема-2">1. Проблема</a></li>
+  <li><a href="#аналоги-1" id="toc-аналоги-1" class="nav-link" data-scroll-target="#аналоги-1">2. Аналоги</a></li>
+  <li><a href="#схема-внедрения-1" id="toc-схема-внедрения-1" class="nav-link" data-scroll-target="#схема-внедрения-1">3. Схема внедрения</a></li>
+  <li><a href="#структуры-данных-1" id="toc-структуры-данных-1" class="nav-link" data-scroll-target="#структуры-данных-1">4. Структуры данных</a></li>
+  <li><a href="#цена-и-ограничения-1" id="toc-цена-и-ограничения-1" class="nav-link" data-scroll-target="#цена-и-ограничения-1">5. Цена и ограничения</a></li>
+  </ul></li>
+  <li><a href="#пример-3.-аналитическая-витрина-для-интернет-магазина" id="toc-пример-3.-аналитическая-витрина-для-интернет-магазина" class="nav-link" data-scroll-target="#пример-3.-аналитическая-витрина-для-интернет-магазина">Пример 3. Аналитическая витрина для интернет-магазина</a>
+  <ul class="collapse">
+  <li><a href="#проблема-3" id="toc-проблема-3" class="nav-link" data-scroll-target="#проблема-3">1. Проблема</a></li>
+  <li><a href="#аналоги-2" id="toc-аналоги-2" class="nav-link" data-scroll-target="#аналоги-2">2. Аналоги</a></li>
+  <li><a href="#схема-внедрения-2" id="toc-схема-внедрения-2" class="nav-link" data-scroll-target="#схема-внедрения-2">3. Схема внедрения</a></li>
+  <li><a href="#структуры-данных-2" id="toc-структуры-данных-2" class="nav-link" data-scroll-target="#структуры-данных-2">4. Структуры данных</a></li>
+  <li><a href="#цена-и-ограничения-2" id="toc-цена-и-ограничения-2" class="nav-link" data-scroll-target="#цена-и-ограничения-2">5. Цена и ограничения</a></li>
+  </ul></li>
+  <li><a href="#зачем-это-нужно" id="toc-зачем-это-нужно" class="nav-link" data-scroll-target="#зачем-это-нужно">Зачем это нужно</a></li>
+  <li><a href="#критерии-оценки" id="toc-критерии-оценки" class="nav-link" data-scroll-target="#критерии-оценки">Критерии оценки</a></li>
   </ul></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Другие форматы</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>Typst</a></li></ul></div></nav>
@@ -169,7 +204,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Практика 4: Специализированные индексы и поиск</h1>
+<h1 class="title">Практика 4: [Опционально] Расширение системы</h1>
 </div>
 
 
@@ -189,186 +224,675 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- AUTOGENERATED-BACK-LINK -->
 <p><a href="../../../../courses/ais/index.html" class="back-to-course">← Обратно к курсу</a></p>
 <!-- /AUTOGENERATED-BACK-LINK -->
-<section id="практика-4-специализированные-индексы-и-поиск" class="level1">
-<h1>Практика 4: Специализированные индексы и поиск</h1>
-<section id="предисловие" class="level2">
-<h2 class="anchored" data-anchor-id="предисловие">Предисловие</h2>
-<p>Классические индексы (B-tree, hash) оптимизированы для точного поиска по ключу. Но многие задачи требуют <em>поиска похожих элементов</em>: текстовый поиск по словам, рекомендации по семантической близости, геопоиск “рядом со мной”. Для этих задач используются специализированные структуры данных: инвертированный индекс, векторные индексы (HNSW, LSH), пространственные индексы (R-Tree).</p>
-</section>
-<section id="задание" class="level2">
-<h2 class="anchored" data-anchor-id="задание">Задание</h2>
-<p>Для вашего варианта добавьте <strong>три типа поиска</strong>:</p>
-<p><strong>1. Полнотекстовый поиск (инвертированный индекс)</strong></p>
-<p>Реализуйте поиск по одному из:</p>
-<ul>
-<li>Интернет-магазин: поиск товаров по названию и описанию</li>
-<li>Социальная сеть: поиск постов по ключевым словам</li>
-<li>Сервис бронирования: поиск отелей по названию и удобствам</li>
-<li>Банк: поиск транзакций по описанию</li>
-</ul>
-<p><strong>Требования:</strong></p>
-<ul>
-<li>Опишите структуру инвертированного индекса (термин → список документов)</li>
-<li>Покажите пример запроса (AND/OR терминов)</li>
-<li>Выберите решение: PostgreSQL full-text search, Elasticsearch или собственную реализацию</li>
-<li>Обоснуйте выбор</li>
-</ul>
-<p><strong>2. Векторный поиск (эмбеддинги + ANN)</strong></p>
-<p>Реализуйте семантический поиск:</p>
-<ul>
-<li>Интернет-магазин: “похожие товары” по описанию</li>
-<li>Социальная сеть: рекомендации постов по интересам пользователя</li>
-<li>Сервис бронирования: рекомендации отелей по предпочтениям</li>
-<li>Банк: детекция подозрительных транзакций (аномалии)</li>
-</ul>
-<p><strong>Требования:</strong></p>
-<ul>
-<li>Опишите, как создаются эмбеддинги (модель: BERT, sentence-transformers)</li>
-<li>Выберите метрику близости: косинусное сходство, L2, скалярное произведение</li>
-<li>Выберите ANN-индекс: HNSW, LSH, IVF</li>
-<li>Оцените размер индекса (число векторов × размерность × 4 байта)</li>
-</ul>
-<p><strong>3. Геопространственный поиск (только для магазина/бронирования/такси)</strong></p>
-<p>Если ваш сценарий подразумевает геоданные:</p>
-<ul>
-<li>Интернет-магазин: поиск ближайших пунктов выдачи</li>
-<li>Сервис бронирования: поиск отелей в радиусе 5 км</li>
-</ul>
-<p><strong>Требования:</strong></p>
-<ul>
-<li>Выберите структуру: R-Tree, QuadTree, KD-Tree</li>
-<li>Покажите пример запроса (по диапазону, k ближайших соседей)</li>
-<li>Обоснуйте выбор</li>
-</ul>
-<p><strong>Формат ответа:</strong> документ с описанием каждого типа поиска, примерами запросов и обоснованиями.</p>
-</section>
-<section id="пример" class="level2">
-<h2 class="anchored" data-anchor-id="пример">Пример</h2>
-<p><strong>1. Полнотекстовый поиск товаров</strong></p>
-<p><strong>Задача:</strong> пользователь вводит “беспроводные наушники bluetooth”, нужно найти релевантные товары.</p>
-<p><strong>Решение: PostgreSQL Full-Text Search</strong></p>
-<p>Создание инвертированного индекса:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Добавляем tsvector колонку для поиска</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> <span class="kw">TABLE</span> products <span class="kw">ADD</span> <span class="kw">COLUMN</span> search_vector tsvector;</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- Создаём GIN индекс</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">INDEX</span> idx_products_search <span class="kw">ON</span> products <span class="kw">USING</span> GIN(search_vector);</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- Заполняем search_vector (триггером при INSERT/UPDATE)</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">UPDATE</span> products <span class="kw">SET</span> search_vector <span class="op">=</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    to_tsvector(<span class="st">'russian'</span>, name <span class="op">||</span> <span class="st">' '</span> <span class="op">||</span> description);</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Пример запроса:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">id</span>, name, ts_rank(search_vector, <span class="kw">query</span>) <span class="kw">AS</span> <span class="fu">rank</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> products,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>     to_tsquery(<span class="st">'russian'</span>, <span class="st">'беспроводные &amp; наушники &amp; bluetooth'</span>) <span class="kw">AS</span> <span class="kw">query</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> search_vector @@ <span class="kw">query</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> <span class="fu">rank</span> <span class="kw">DESC</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">20</span>;</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>Как работает:</strong></p>
+<section id="практика-4-опционально-расширение-системы" class="level1">
+<h1>Практика 4: [Опционально] Расширение системы</h1>
+<section id="статус-практики" class="level2">
+<h2 class="anchored" data-anchor-id="статус-практики">Статус практики</h2>
+<p>Практика дополнительная. Здесь вы исследуете, как расширить систему из предыдущих практик одной новой подсистемой: поиском, геоданными, наблюдаемостью, безопасностью, операционным компонентом, аналитической витриной или другим подходящим модулем.</p>
+<p>Код писать не обязательно. Достаточно показать схему, провести небольшой обзор возможных решений и объяснить, как выбранное решение можно применить в вашей задаче.</p>
+<p>После первых трёх практик у вас уже есть основа проекта:</p>
 <ol type="1">
-<li><code>to_tsvector</code> токенизирует текст → стемминг → вектор терминов
-<ul>
-<li>“беспроводные наушники” → <code>'беспровод':1 'наушник':2</code></li>
-</ul></li>
-<li><code>to_tsquery</code> создаёт запрос с операторами AND (&amp;), OR (|)</li>
-<li>GIN индекс: для каждого термина — список документов (posting list)</li>
-<li><code>@@</code> оператор: пересечение posting lists для AND-запроса</li>
-<li><code>ts_rank</code>: ранжирование по TF-IDF</li>
+<li>В Практике 1 вы спроектировали продукт, пользовательский сценарий, API и архитектуру.</li>
+<li>В Практике 2 вы реализовали приложение со слоями, портами и репозиториями.</li>
+<li>В Практике 3 вы спроектировали OLTP-схему, написали SQL и посмотрели планы выполнения запросов.</li>
 </ol>
-<p><strong>Обоснование выбора PostgreSQL:</strong></p>
+<p>В Практике 4 нужно взять эту основу и спроектировать одну подсистему на выбор. Подойдут, например:</p>
 <ul>
-<li>Встроенная поддержка (не нужен отдельный сервис)</li>
-<li>Достаточно для 100k товаров</li>
-<li>Поддержка морфологии (русский, английский)</li>
-<li>❌ Elasticsearch был бы лучше для &gt;1M товаров и сложного ранжирования</li>
+<li>структурированные логи;</li>
+<li>геопоиск;</li>
+<li>полнотекстовый поиск;</li>
+<li>векторный поиск;</li>
+<li>аналитическая витрина;</li>
+<li>ограничение частоты запросов;</li>
+<li>аутентификация и авторизация;</li>
+<li>наблюдаемость;</li>
+<li>кэш;</li>
+<li>очередь;</li>
+<li>фоновая обработка;</li>
+<li>другой компонент, который подходит вашему проекту.</li>
 </ul>
-<p><strong>2. Векторный поиск похожих товаров</strong></p>
-<p><strong>Задача:</strong> на странице товара показать “похожие товары” по описанию.</p>
-<p><strong>Решение: sentence-transformers + pgvector (PostgreSQL extension)</strong></p>
-<p>Создание эмбеддингов:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sentence_transformers <span class="im">import</span> SentenceTransformer</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SentenceTransformer(<span class="st">'paraphrase-multilingual-mpnet-base-v2'</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Для каждого товара создаём эмбеддинг</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> product <span class="kw">in</span> products:</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    text <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>product<span class="sc">.</span>name<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>product<span class="sc">.</span>description<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    embedding <span class="op">=</span> model.encode(text)  <span class="co"># 768-мерный вектор</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Сохраняем в БД</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Схема БД:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> EXTENSION vector;</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> <span class="kw">TABLE</span> products <span class="kw">ADD</span> <span class="kw">COLUMN</span> embedding vector(<span class="dv">768</span>);</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- Создаём HNSW индекс для быстрого поиска</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">INDEX</span> <span class="kw">ON</span> products <span class="kw">USING</span> hnsw (embedding vector_cosine_ops);</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Поиск похожих товаров:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">id</span>, name,</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span> <span class="op">-</span> (embedding <span class="op">&lt;=&gt;</span> $<span class="dv">1</span>:<span class="ch">:vector</span>) <span class="kw">AS</span> similarity</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> products</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> <span class="kw">id</span> <span class="op">!=</span> $<span class="dv">2</span>  <span class="co">-- исключаем сам товар</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> embedding <span class="op">&lt;=&gt;</span> $<span class="dv">1</span>:<span class="ch">:vector</span>  <span class="co">-- косинусное расстояние</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>Метрики:</strong></p>
+<p>Выбор должен быть связан с задачей. В отчёте нужно объяснить проблему, посмотреть аналоги, выбрать схему внедрения для своей системы и показать реальные структуры данных. При такой свободе особенно важна конкретика: привязывайте решение к одному обработчику API, сценарию, таблице, событию или потоку данных из вашего проекта.</p>
+</section>
+<section id="что-можно-выбрать" class="level2">
+<h2 class="anchored" data-anchor-id="что-можно-выбрать">Что можно выбрать</h2>
+<p>Выберите один вариант расширения:</p>
 <ul>
-<li>Размерность: 768</li>
-<li>Метрика: <strong>косинусное сходство</strong> (через <code>vector_cosine_ops</code>)
-<ul>
-<li>Обоснование: длина вектора не важна, важен только смысл описания</li>
-</ul></li>
-<li>Индекс: <strong>HNSW</strong> (Hierarchical Navigable Small World)
-<ul>
-<li>Полнота ~95%, задержка ~1-5 мс для 100k векторов</li>
-</ul></li>
+<li><strong>Структурированные логи и наблюдаемость:</strong> JSON-логи, идентификатор корреляции или трассировки, метрики, трассы, сбор в Loki / Elasticsearch / OpenTelemetry.</li>
+<li><strong>Геопоиск:</strong> ближайшие водители, рестораны в зоне доставки, пункты выдачи рядом с пользователем, поиск по радиусу или по полигону.</li>
+<li><strong>Аналитика и витрина:</strong> витрина продаж, событийная аналитика, ClickHouse / DuckDB / BigQuery, загрузка данных из OLTP.</li>
+<li><strong>Полнотекстовый или префиксный поиск:</strong> поиск товаров, постов, врачей, курсов, подсказки при вводе.</li>
+<li><strong>Векторный поиск:</strong> похожие товары, похожие посты, поиск по смыслу, рекомендации.</li>
+<li><strong>Ограничение нагрузки:</strong> лимит запросов, антиспам, защита дорогих обработчиков API, очереди для тяжёлых задач.</li>
+<li><strong>Безопасность:</strong> аутентификация, авторизация, роли, права, журнал аудита.</li>
+<li><strong>Кэширование:</strong> Redis, кэш в памяти, сброс кэша, TTL, защита от одновременного пересчёта одного ключа.</li>
+<li><strong>Асинхронная обработка:</strong> очередь задач, таблица исходящих событий, отправка уведомлений, пересчёт агрегатов.</li>
 </ul>
-<p><strong>Оценка размера:</strong></p>
-<pre><code>100,000 товаров × 768 dim × 4 байта = 307 МБ
-HNSW индекс добавляет ~2× накладных расходов = 614 МБ
-Итого: ~1 ГБ (легко помещается в RAM)</code></pre>
-<p><strong>Альтернативы:</strong></p>
+<p>Можно предложить свой вариант, если он продолжает сценарий из практик 1-3.</p>
+<p>Чтобы тема не расплывалась, зафиксируйте границы работы:</p>
 <ul>
-<li>❌ <strong>LSH</strong>: хуже полнота (~80%), но быстрее. Не нужно для 100k векторов.</li>
-<li>❌ <strong>Faiss</strong> (Facebook AI Similarity Search): избыточно, pgvector достаточно</li>
+<li>какой сценарий проекта вы улучшаете;</li>
+<li>какой компонент добавляете;</li>
+<li>где он стоит на схеме;</li>
+<li>какие данные читает и пишет;</li>
+<li>как поймёте, что решение подходит.</li>
 </ul>
-<p><strong>3. Геопоиск пунктов выдачи</strong></p>
-<p><strong>Задача:</strong> найти ближайшие 5 пунктов выдачи к адресу пользователя.</p>
-<p><strong>Решение: PostGIS (R-Tree)</strong></p>
-<p>Схема:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> EXTENSION postgis;</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> pickup_points (</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">id</span> SERIAL <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    name <span class="dt">VARCHAR</span>(<span class="dv">255</span>),</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    address <span class="dt">VARCHAR</span>(<span class="dv">255</span>),</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    location GEOMETRY(Point, <span class="dv">4326</span>)  <span class="co">-- WGS84 координаты</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>);</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- Создаём GIST индекс (R-Tree)</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">INDEX</span> idx_pickup_location <span class="kw">ON</span> pickup_points <span class="kw">USING</span> GIST(location);</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
-<p>kNN запрос (5 ближайших):</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">id</span>, name, address,</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>       ST_Distance(location, ST_MakePoint(<span class="fl">37.6173</span>, <span class="fl">55.7558</span>):<span class="ch">:geography</span>) <span class="kw">AS</span> distance_meters</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> pickup_points</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> location <span class="op">&lt;-&gt;</span> ST_MakePoint(<span class="fl">37.6173</span>, <span class="fl">55.7558</span>):<span class="ch">:geometry</span>  <span class="co">-- kNN оператор</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span>;</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Запрос по радиусу (все пункты в радиусе 5 км):</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">id</span>, name, address</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> pickup_points</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> ST_DWithin(</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    location:<span class="ch">:geography</span>,</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    ST_MakePoint(<span class="fl">37.6173</span>, <span class="fl">55.7558</span>):<span class="ch">:geography</span>,</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="dv">5000</span>  <span class="co">-- 5 км в метрах</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>);</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>Обоснование R-Tree:</strong></p>
+</section>
+<section id="протокол-отчёта" class="level2">
+<h2 class="anchored" data-anchor-id="протокол-отчёта">Протокол отчёта</h2>
+<p>Чтобы отчёты было проще читать и сравнивать, придерживайтесь одной структуры.</p>
+<section id="проблема" class="level3">
+<h3 class="anchored" data-anchor-id="проблема">1. Проблема</h3>
+<p>Опишите конкретную проблему в вашей системе после Практики 3.</p>
+<p>Лучше писать через пользовательский или операционный сценарий:</p>
 <ul>
-<li>Оптимален для точек (пункты выдачи)</li>
-<li>Поддержка kNN и запросов по диапазону</li>
-<li>Встроен в PostGIS</li>
+<li>оператор поддержки не может найти, почему заказ перешёл в ошибочный статус;</li>
+<li>пользователь такси ждёт список ближайших водителей меньше 300 мс;</li>
+<li>менеджер хочет видеть выручку по дням без тяжёлых <code>GROUP BY</code> в OLTP-базе;</li>
+<li>поиск по <code>ILIKE '%iphone%'</code> на 500k товаров занимает секунды;</li>
+<li>дорогой обработчик API можно вызвать 1000 раз в минуту и перегрузить БД.</li>
 </ul>
-<p><strong>Альтернативы:</strong></p>
+<p>В разделе укажите:</p>
 <ul>
-<li>❌ <strong>QuadTree</strong>: хорош для равномерных данных (игры), но пункты выдачи кластеризуются в городах</li>
-<li>❌ <strong>KD-Tree</strong>: тоже подошёл бы, но R-Tree лучше для неравномерных данных</li>
+<li>какой обработчик API, сценарий или таблицы затрагиваются;</li>
+<li>сколько данных или запросов ожидается;</li>
+<li>какая задержка, точность, надёжность или стоимость считается приемлемой;</li>
+<li>где текущая система из практик 1-3 упирается в ограничение.</li>
+</ul>
+</section>
+<section id="аналоги-и-варианты-решения" class="level3">
+<h3 class="anchored" data-anchor-id="аналоги-и-варианты-решения">2. Аналоги и варианты решения</h3>
+<p>Рассмотрите 2-3 возможных подхода. Для каждого подхода кратко укажите:</p>
+<ul>
+<li>какую структуру данных или архитектурную схему он использует;</li>
+<li>какие продукты или библиотеки подходят;</li>
+<li>чем решение удобно;</li>
+<li>какую цену придётся заплатить: память, сложность, задержка записи, временно несогласованные данные, поддержка инфраструктуры.</li>
+</ul>
+<p>Примеры сравнения:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Проблема</th>
+<th>Вариант 1</th>
+<th>Вариант 2</th>
+<th>Вариант 3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Геопоиск</td>
+<td>PostGIS GiST</td>
+<td>Redis GEO</td>
+<td>геохеш / квадродерево в приложении</td>
+</tr>
+<tr class="even">
+<td>Аналитика</td>
+<td>ClickHouse</td>
+<td>DuckDB + Parquet</td>
+<td>материализованные представления в PostgreSQL</td>
+</tr>
+<tr class="odd">
+<td>Логи</td>
+<td>JSON-логи + Loki</td>
+<td>ELK / OpenSearch</td>
+<td>OpenTelemetry Collector</td>
+</tr>
+<tr class="even">
+<td>Поиск</td>
+<td>PostgreSQL GIN</td>
+<td>Elasticsearch</td>
+<td>префиксное дерево / автодополнение в Redis</td>
+</tr>
+<tr class="odd">
+<td>Ограничение частоты запросов</td>
+<td>ведро токенов</td>
+<td>счётчик в скользящем окне</td>
+<td>фиксированное окно</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="выбранная-схема-для-вашей-системы" class="level3">
+<h3 class="anchored" data-anchor-id="выбранная-схема-для-вашей-системы">3. Выбранная схема для вашей системы</h3>
+<p>Выберите один вариант и объясните, почему он подходит вашему проекту.</p>
+<p>Покажите:</p>
+<ul>
+<li>где новый компонент появляется на архитектурной схеме;</li>
+<li>какие существующие сценарии, обработчики, репозитории или таблицы меняются;</li>
+<li>какие новые порты / интерфейсы появляются;</li>
+<li>какие реализации этих портов используются;</li>
+<li>синхронно или асинхронно работает компонент;</li>
+<li>что происходит при ошибке компонента.</li>
+</ul>
+<p>Если вы придерживаетесь чистой архитектуры, подключайте новый компонент через порт. Сценарий должен зависеть от интерфейса, а конкретный клиент ClickHouse, PostGIS, Loki, Redis или Kafka остаётся в инфраструктурном слое.</p>
+<p>Пример формата:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Слой</th>
+<th>Новый компонент</th>
+<th>Тип</th>
+<th>С чем связан</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Сценарии</td>
+<td><code>CreateOrderUseCase</code></td>
+<td>существующий</td>
+<td>вызывает <code>AuditLogPort</code> после смены статуса</td>
+</tr>
+<tr class="even">
+<td>Порты</td>
+<td><code>AuditLogPort</code></td>
+<td>интерфейс</td>
+<td>контракт записи события аудита</td>
+</tr>
+<tr class="odd">
+<td>Инфраструктура</td>
+<td><code>LokiAuditLogWriter</code></td>
+<td>реализация</td>
+<td>пишет JSON в стандартный вывод или Loki</td>
+</tr>
+<tr class="even">
+<td>Хранилище</td>
+<td><code>audit_events</code></td>
+<td>таблица или поток</td>
+<td>хранит события для расследований</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="реальные-структуры-данных" class="level3">
+<h3 class="anchored" data-anchor-id="реальные-структуры-данных">4. Реальные структуры данных</h3>
+<p>Покажите конкретные структуры, по которым можно понять, как решение будет работать.</p>
+<p>В зависимости от темы подойдут:</p>
+<ul>
+<li>SQL DDL таблиц и индексов;</li>
+<li>JSON-схема события или лога;</li>
+<li>ClickHouse DDL;</li>
+<li>GraphQL / REST / gRPC-контракт нового обработчика API;</li>
+<li>структура ключей Redis;</li>
+<li>формат сообщения в очереди;</li>
+<li>интерфейсы портов;</li>
+<li>параметры индекса: <code>GIN</code>, <code>GiST</code>, <code>HNSW</code>, <code>M</code>, <code>ef_search</code>, TTL, размер корзины.</li>
+</ul>
+<p>Минимум: 2-3 реальные структуры данных. Для каждой напишите, кто её пишет, кто читает и как она обновляется.</p>
+</section>
+<section id="цена-решения-и-ограничения" class="level3">
+<h3 class="anchored" data-anchor-id="цена-решения-и-ограничения">5. Цена решения и ограничения</h3>
+<p>Опишите компромиссы:</p>
+<ul>
+<li>сколько памяти или диска занимает структура;</li>
+<li>как меняется скорость записи;</li>
+<li>есть ли задержка между OLTP и новым компонентом;</li>
+<li>как обрабатываются дубли, ретраи и ошибки;</li>
+<li>какие данные могут устареть;</li>
+<li>какие метрики покажут, что решение работает.</li>
+</ul>
+</section>
+<section id="минимальный-план-внедрения" class="level3">
+<h3 class="anchored" data-anchor-id="минимальный-план-внедрения">6. Минимальный план внедрения</h3>
+<p>Опишите 3-5 шагов:</p>
+<ol type="1">
+<li>Добавить порт / интерфейс.</li>
+<li>Добавить реализацию и структуру хранения.</li>
+<li>Подключить компонент к одному сценарию.</li>
+<li>Добавить тестовый сценарий или демонстрационный запрос.</li>
+<li>Измерить или оценить ключевую метрику.</li>
+</ol>
+<p>Код писать не обязательно. Можно ограничиться проектированием и исследованием решения. В таком случае отчёт должен быть достаточно конкретным, чтобы по нему можно было реализовать компонент без дополнительного обсуждения.</p>
+</section>
+</section>
+<section id="что-сдаётся" class="level2">
+<h2 class="anchored" data-anchor-id="что-сдаётся">Что сдаётся</h2>
+<ol type="1">
+<li>Документ <code>markdown</code> / <code>pdf</code> / <code>qmd</code> по протоколу выше.</li>
+<li>Обновлённая архитектурная схема с новым компонентом.</li>
+<li>Реальные структуры данных: DDL, JSON, интерфейсы, ключи, сообщения, конфигурация индекса.</li>
+<li>Один демонстрационный сценарий: SQL-запрос, API-вызов, пример лога, пример события, пример панели или пример ответа нового обработчика API.</li>
+<li>Код не обязателен. Если он есть, добавьте ссылки на файлы и инструкцию запуска.</li>
+</ol>
+</section>
+<section id="пример-1.-структурированные-логи-для-интернет-магазина" class="level2">
+<h2 class="anchored" data-anchor-id="пример-1.-структурированные-логи-для-интернет-магазина">Пример 1. Структурированные логи для интернет-магазина</h2>
+<section id="проблема-1" class="level3">
+<h3 class="anchored" data-anchor-id="проблема-1">1. Проблема</h3>
+<p>В интернет-магазине есть обработчик <code>POST /orders</code>. Иногда заказ получает статус <code>failed</code>, и команде нужно быстро понять, где произошла ошибка: при проверке корзины, резервировании товара, записи заказа или отправке уведомления.</p>
+<p>Требование: для каждого заказа можно за 1-2 минуты найти цепочку событий по <code>order_id</code> или <code>trace_id</code>. Логи должны быть машинно-читаемыми, чтобы их можно было фильтровать в Loki или Elasticsearch.</p>
+</section>
+<section id="аналоги" class="level3">
+<h3 class="anchored" data-anchor-id="аналоги">2. Аналоги</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Вариант</th>
+<th>Что даёт</th>
+<th>Цена</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Обычный текстовый лог</td>
+<td>просто внедрить</td>
+<td>трудно фильтровать, нет стабильной схемы</td>
+</tr>
+<tr class="even">
+<td>JSON-логи + Loki</td>
+<td>недорогой сбор логов, фильтр по меткам</td>
+<td>нужно следить за кардинальностью меток</td>
+</tr>
+<tr class="odd">
+<td>Трассы OpenTelemetry</td>
+<td>видно дерево вызовов и задержки</td>
+<td>больше инфраструктуры и инструментирования</td>
+</tr>
+</tbody>
+</table>
+<p>Выбор: JSON-логи + <code>trace_id</code>. Для такой задачи достаточно хорошо искать события заказа и видеть причину ошибки. Полную распределённую трассировку можно добавить позже, когда появится несколько сервисов и станет важен путь запроса между ними.</p>
+</section>
+<section id="схема-внедрения" class="level3">
+<h3 class="anchored" data-anchor-id="схема-внедрения">3. Схема внедрения</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Слой</th>
+<th>Компонент</th>
+<th>Тип</th>
+<th>Назначение</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Сценарии</td>
+<td><code>CreateOrderUseCase</code></td>
+<td>существующий</td>
+<td>пишет события <code>order_created</code>, <code>stock_reserved</code>, <code>order_failed</code></td>
+</tr>
+<tr class="even">
+<td>Порты</td>
+<td><code>StructuredLogger</code></td>
+<td>интерфейс</td>
+<td>принимает типизированное событие</td>
+</tr>
+<tr class="odd">
+<td>Инфраструктура</td>
+<td><code>JsonLogger</code></td>
+<td>реализация</td>
+<td>сериализует событие в JSON</td>
+</tr>
+<tr class="even">
+<td>Эксплуатация</td>
+<td>Loki / OpenSearch</td>
+<td>хранилище</td>
+<td>индексирует логи по времени и меткам</td>
+</tr>
+</tbody>
+</table>
+<p>Порт:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode go code-with-copy"><code class="sourceCode go"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> StructuredLogger <span class="kw">interface</span> <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    Info<span class="op">(</span>ctx context<span class="op">.</span>Context<span class="op">,</span> event LogEvent<span class="op">)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    Error<span class="op">(</span>ctx context<span class="op">.</span>Context<span class="op">,</span> event LogEvent<span class="op">)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="структуры-данных" class="level3">
+<h3 class="anchored" data-anchor-id="структуры-данных">4. Структуры данных</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"timestamp"</span><span class="fu">:</span> <span class="st">"2026-05-13T12:30:15.123Z"</span><span class="fu">,</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"level"</span><span class="fu">:</span> <span class="st">"ERROR"</span><span class="fu">,</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"service"</span><span class="fu">:</span> <span class="st">"shop-api"</span><span class="fu">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"trace_id"</span><span class="fu">:</span> <span class="st">"9f7c2a1e"</span><span class="fu">,</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"user_id"</span><span class="fu">:</span> <span class="dv">123</span><span class="fu">,</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"order_id"</span><span class="fu">:</span> <span class="dv">987</span><span class="fu">,</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"event"</span><span class="fu">:</span> <span class="st">"order_failed"</span><span class="fu">,</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"reason"</span><span class="fu">:</span> <span class="st">"insufficient_stock"</span><span class="fu">,</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"product_id"</span><span class="fu">:</span> <span class="dv">55</span><span class="fu">,</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"requested"</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"available"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"duration_ms"</span><span class="fu">:</span> <span class="dv">42</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode go code-with-copy"><code class="sourceCode go"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> LogEvent <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    Event      <span class="dt">string</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    UserID     <span class="op">*</span><span class="dt">int64</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    OrderID    <span class="op">*</span><span class="dt">int64</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    ProductID  <span class="op">*</span><span class="dt">int64</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    Reason     <span class="dt">string</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    DurationMs <span class="dt">int64</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    Fields     <span class="kw">map</span><span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="dt">any</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Метки Loki:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">labels</span><span class="kw">:</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">service</span><span class="kw">:</span><span class="at"> shop-api</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">level</span><span class="kw">:</span><span class="at"> error</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">event</span><span class="kw">:</span><span class="at"> order_failed</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>user_id</code> и <code>order_id</code> остаются в JSON-поле. В метки берите поля с небольшим числом значений, иначе индекс станет тяжёлым.</p>
+</section>
+<section id="цена-и-ограничения" class="level3">
+<h3 class="anchored" data-anchor-id="цена-и-ограничения">5. Цена и ограничения</h3>
+<p>Запись лога добавляет небольшую нагрузку на процессор из-за JSON-сериализации. При большом трафике отладочные логи лучше включать точечно. Если Loki недоступен, приложение продолжает работать: лог уходит в stdout, а сборщик заберёт его позже.</p>
+<p>Ключевые метрики: количество <code>order_failed</code>, доля ошибок по обработчику API, p95 <code>duration_ms</code>, время поиска инцидента по <code>trace_id</code>.</p>
+</section>
+</section>
+<section id="пример-2.-геопоиск-для-сервиса-доставки-еды" class="level2">
+<h2 class="anchored" data-anchor-id="пример-2.-геопоиск-для-сервиса-доставки-еды">Пример 2. Геопоиск для сервиса доставки еды</h2>
+<section id="проблема-2" class="level3">
+<h3 class="anchored" data-anchor-id="проблема-2">1. Проблема</h3>
+<p>Пользователь вводит адрес, а система должна показать рестораны, которые доставляют в эту точку. В OLTP-схеме из Практики 3 рестораны уже есть, но обычный B-tree по широте и долготе плохо подходит для запросов по зоне доставки или радиусу.</p>
+<p>Требование: p95 меньше 200 мс при 100k ресторанов и частоте 50 запросов в секунду.</p>
+</section>
+<section id="аналоги-1" class="level3">
+<h3 class="anchored" data-anchor-id="аналоги-1">2. Аналоги</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Вариант</th>
+<th>Что даёт</th>
+<th>Цена</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>PostGIS + GiST</td>
+<td>точные геометрические запросы, SQL-интеграция</td>
+<td>нужно расширение PostGIS и понимание SRID</td>
+</tr>
+<tr class="even">
+<td>Redis GEO</td>
+<td>быстрый поиск по радиусу в памяти</td>
+<td>ограничен точками, сложнее с полигонами доставки</td>
+</tr>
+<tr class="odd">
+<td>Геохеш / квадродерево</td>
+<td>можно реализовать в приложении</td>
+<td>больше собственного кода и краевых случаев</td>
+</tr>
+</tbody>
+</table>
+<p>Выбор: PostGIS + GiST. В проекте уже используется PostgreSQL, а зоны доставки удобно хранить как геометрию: так проще описывать полигоны и проверять попадание адреса.</p>
+</section>
+<section id="схема-внедрения-1" class="level3">
+<h3 class="anchored" data-anchor-id="схема-внедрения-1">3. Схема внедрения</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Слой</th>
+<th>Компонент</th>
+<th>Тип</th>
+<th>Назначение</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Сценарии</td>
+<td><code>FindAvailableRestaurantsUseCase</code></td>
+<td>существующий или новый</td>
+<td>ищет рестораны для адреса</td>
+</tr>
+<tr class="even">
+<td>Порты</td>
+<td><code>RestaurantGeoRepository</code></td>
+<td>интерфейс</td>
+<td>контракт геопоиска</td>
+</tr>
+<tr class="odd">
+<td>Инфраструктура</td>
+<td><code>PostgisRestaurantGeoRepository</code></td>
+<td>реализация</td>
+<td>выполняет SQL с <code>ST_Contains</code> / <code>ST_DWithin</code></td>
+</tr>
+<tr class="even">
+<td>Хранилище</td>
+<td><code>restaurant_delivery_zones</code></td>
+<td>таблица</td>
+<td>хранит полигоны доставки</td>
+</tr>
+</tbody>
+</table>
+<p>Порт:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode go code-with-copy"><code class="sourceCode go"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> RestaurantGeoRepository <span class="kw">interface</span> <span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    FindByPoint<span class="op">(</span>ctx context<span class="op">.</span>Context<span class="op">,</span> point GeoPoint<span class="op">)</span> <span class="op">([]</span>Restaurant<span class="op">,</span> <span class="dt">error</span><span class="op">)</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> GeoPoint <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    Lat <span class="dt">float64</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    Lon <span class="dt">float64</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="структуры-данных-1" class="level3">
+<h3 class="anchored" data-anchor-id="структуры-данных-1">4. Структуры данных</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> EXTENSION <span class="cf">IF</span> <span class="kw">NOT</span> <span class="kw">EXISTS</span> postgis;</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> restaurant_delivery_zones (</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    restaurant_id BIGINT <span class="kw">PRIMARY</span> <span class="kw">KEY</span> <span class="kw">REFERENCES</span> restaurants(<span class="kw">id</span>),</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">zone</span> geometry(Polygon, <span class="dv">4326</span>) <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    updated_at TIMESTAMPTZ <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> now()</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">INDEX</span> idx_restaurant_delivery_zones_gist</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> restaurant_delivery_zones</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="kw">USING</span> GIST (<span class="dt">zone</span>);</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> r.<span class="kw">id</span>, r.name, r.rating</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> restaurants r</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> restaurant_delivery_zones z <span class="kw">ON</span> z.restaurant_id <span class="op">=</span> r.<span class="kw">id</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> ST_Contains(</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    z.<span class="dt">zone</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    ST_SetSRID(ST_MakePoint($<span class="dv">1</span>, $<span class="dv">2</span>), <span class="dv">4326</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> r.rating <span class="kw">DESC</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">50</span>;</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Если нужен поиск ближайших курьеров:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> courier_locations (</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    courier_id BIGINT <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    location geography(Point, <span class="dv">4326</span>) <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    updated_at TIMESTAMPTZ <span class="kw">NOT</span> <span class="kw">NULL</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">INDEX</span> idx_courier_locations_gist</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> courier_locations</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="kw">USING</span> GIST (location);</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="цена-и-ограничения-1" class="level3">
+<h3 class="anchored" data-anchor-id="цена-и-ограничения-1">5. Цена и ограничения</h3>
+<p>GiST-индекс занимает место на диске и замедляет обновление зон доставки. Для ресторанов подходит: зоны меняются редко. Координаты курьеров обновляются часто, и для них может понадобиться Redis GEO или отдельное хранилище в памяти.</p>
+<p>Метрики: p95 геозапроса, количество ресторанов-кандидатов, доля пустых выдач, частота обновления геоданных.</p>
+</section>
+</section>
+<section id="пример-3.-аналитическая-витрина-для-интернет-магазина" class="level2">
+<h2 class="anchored" data-anchor-id="пример-3.-аналитическая-витрина-для-интернет-магазина">Пример 3. Аналитическая витрина для интернет-магазина</h2>
+<section id="проблема-3" class="level3">
+<h3 class="anchored" data-anchor-id="проблема-3">1. Проблема</h3>
+<p>Менеджер хочет видеть выручку по дням, топ товаров и средний чек. Если считать отчёты прямо в PostgreSQL по таблицам <code>orders</code> и <code>order_items</code>, аналитические <code>GROUP BY</code> начинают мешать OLTP-запросам оформления заказа.</p>
+<p>Требование: отчёты за последние 90 дней открываются меньше чем за 1 секунду, а OLTP-база остаётся под пользовательскую нагрузку.</p>
+</section>
+<section id="аналоги-2" class="level3">
+<h3 class="anchored" data-anchor-id="аналоги-2">2. Аналоги</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Вариант</th>
+<th>Что даёт</th>
+<th>Цена</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Материализованные представления в PostgreSQL</td>
+<td>минимум инфраструктуры</td>
+<td>нагрузка остаётся в OLTP, сложнее масштабировать аналитику</td>
+</tr>
+<tr class="even">
+<td>ClickHouse</td>
+<td>быстрые агрегации по колонкам</td>
+<td>отдельная БД и процесс загрузки</td>
+</tr>
+<tr class="odd">
+<td>DuckDB + Parquet</td>
+<td>простая локальная аналитика</td>
+<td>хуже подходит для многопользовательских панелей</td>
+</tr>
+</tbody>
+</table>
+<p>Выбор: ClickHouse. Он хорошо подходит для повторяемых отчётов по большим таблицам, а аналитическая нагрузка уходит из OLTP-базы.</p>
+</section>
+<section id="схема-внедрения-2" class="level3">
+<h3 class="anchored" data-anchor-id="схема-внедрения-2">3. Схема внедрения</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Слой</th>
+<th>Компонент</th>
+<th>Тип</th>
+<th>Назначение</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Сценарии</td>
+<td><code>CreateOrderUseCase</code></td>
+<td>существующий</td>
+<td>после успешного заказа публикует событие</td>
+</tr>
+<tr class="even">
+<td>Порты</td>
+<td><code>OrderEventPublisher</code></td>
+<td>интерфейс</td>
+<td>контракт публикации события</td>
+</tr>
+<tr class="odd">
+<td>Инфраструктура</td>
+<td><code>OutboxOrderEventPublisher</code></td>
+<td>реализация</td>
+<td>пишет событие в таблицу исходящих событий</td>
+</tr>
+<tr class="even">
+<td>Загрузка данных</td>
+<td><code>orders_to_clickhouse_job</code></td>
+<td>фоновый процесс</td>
+<td>переносит события в ClickHouse</td>
+</tr>
+<tr class="odd">
+<td>Аналитическая витрина</td>
+<td><code>orders_fact</code></td>
+<td>таблица</td>
+<td>хранит строки фактов для отчётов</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="структуры-данных-2" class="level3">
+<h3 class="anchored" data-anchor-id="структуры-данных-2">4. Структуры данных</h3>
+<p>Таблица исходящих событий в PostgreSQL:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> outbox_events (</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">id</span> BIGSERIAL <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    event_type TEXT <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    aggregate_id BIGINT <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    payload JSONB <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    created_at TIMESTAMPTZ <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> now(),</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    processed_at TIMESTAMPTZ</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">INDEX</span> idx_outbox_unprocessed</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> outbox_events (created_at)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> processed_at <span class="kw">IS</span> <span class="kw">NULL</span>;</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Событие:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"event_type"</span><span class="fu">:</span> <span class="st">"order_paid"</span><span class="fu">,</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"order_id"</span><span class="fu">:</span> <span class="dv">987</span><span class="fu">,</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"user_id"</span><span class="fu">:</span> <span class="dv">123</span><span class="fu">,</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"paid_at"</span><span class="fu">:</span> <span class="st">"2026-05-13T12:30:15Z"</span><span class="fu">,</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"items"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">"product_id"</span><span class="fu">:</span> <span class="dv">55</span><span class="fu">,</span> <span class="dt">"category_id"</span><span class="fu">:</span> <span class="dv">7</span><span class="fu">,</span> <span class="dt">"quantity"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span> <span class="dt">"price"</span><span class="fu">:</span> <span class="st">"1990.00"</span><span class="fu">}</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>ClickHouse:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> orders_fact (</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    order_id UInt64,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    user_id UInt64,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    product_id UInt64,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    category_id UInt64,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    quantity UInt16,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    price <span class="dt">Decimal</span>(<span class="dv">12</span>, <span class="dv">2</span>),</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    paid_at DateTime</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>ENGINE <span class="op">=</span> MergeTree()</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="kw">PARTITION</span> <span class="kw">BY</span> toYYYYMM(paid_at)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> (product_id, paid_at, order_id);</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Отчёт:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    toDate(paid_at) <span class="kw">AS</span> <span class="dt">day</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(quantity <span class="op">*</span> price) <span class="kw">AS</span> revenue,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    uniqExact(order_id) <span class="kw">AS</span> orders_count</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> orders_fact</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> paid_at <span class="op">&gt;=</span> today() <span class="op">-</span> <span class="dt">INTERVAL</span> <span class="dv">90</span> <span class="dt">DAY</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dt">day</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> <span class="dt">day</span>;</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="цена-и-ограничения-2" class="level3">
+<h3 class="anchored" data-anchor-id="цена-и-ограничения-2">5. Цена и ограничения</h3>
+<p>Данные в аналитической витрине появляются с задержкой: например, раз в минуту или раз в час. Загрузку нужно сделать идемпотентной, чтобы повторная обработка исходящего события проходила без дублей. Источником истины остаётся OLTP-база, а корректировки заказов приходят в витрину отдельными событиями.</p>
+<p>Метрики: задержка между <code>created_at</code> и загрузкой в ClickHouse, количество необработанных исходящих событий, время выполнения отчётов, размер партиций.</p>
+</section>
+</section>
+<section id="зачем-это-нужно" class="level2">
+<h2 class="anchored" data-anchor-id="зачем-это-нужно">Зачем это нужно</h2>
+<p>В реальной работе вам вряд ли понадобится всё, что есть в курсе. Кто-то никогда не будет вручную создавать индекс. Кто-то не полезет во внутреннее устройство аналитических хранилищ, шардирование и партиционирование. Кому-то не пригодятся эмбеддинги, геодеревья или настройка SSO.</p>
+<p>Но почти наверняка вы столкнётесь хотя бы с одной такой темой. В этот момент хочется понимать инструмент глубже, чем на уровне <code>SELECT id FROM users</code>. Легко годами пользоваться базой, очередью, кэшем или поиском и не интересоваться, что происходит внутри. Задачи закрываются, зарплата приходит, но профессиональный рост быстро упирается в потолок.</p>
+<p>Эта практика проверяет именно такой навык: заметить проблему, сравнить варианты, выбрать решение и набросать план внедрения. В реальной работе с помощью LLM такой черновик можно собрать за дни, а не за месяцы. Главное: поставить себе такую задачу и довести рассуждение до конкретной схемы.</p>
+</section>
+<section id="критерии-оценки" class="level2">
+<h2 class="anchored" data-anchor-id="критерии-оценки">Критерии оценки</h2>
+<ul>
+<li>Проблема сформулирована через конкретный сценарий вашей системы.</li>
+<li>Рассмотрены 2-3 аналога.</li>
+<li>Выбранная схема встроена в архитектуру из практик 1-3.</li>
+<li>Показаны реальные структуры данных и контракты.</li>
+<li>Описаны ограничения, стоимость и метрики.</li>
+<li>По отчёту понятно, как внедрять компонент.</li>
 </ul>
 
 

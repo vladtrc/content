@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Индексы: B-tree, hash и bitmap – prototype</title>
+<title>TL;DR: операционные компоненты держат систему живой в продакшене – prototype</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -22,41 +22,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -106,35 +71,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="../../../styles/site.scss">
 </head>
@@ -184,15 +120,11 @@ window.Quarto = {
     <h2 id="toc-title">Содержание</h2>
    
   <ul>
-  <li><a href="#индексы-b-tree-hash-и-bitmap" id="toc-индексы-b-tree-hash-и-bitmap" class="nav-link active" data-scroll-target="#индексы-b-tree-hash-и-bitmap">Индексы: B-tree, hash и bitmap</a>
+  <li><a href="#tldr-операционные-компоненты-держат-систему-живой-в-продакшене" id="toc-tldr-операционные-компоненты-держат-систему-живой-в-продакшене" class="nav-link active" data-scroll-target="#tldr-операционные-компоненты-держат-систему-живой-в-продакшене">TL;DR: операционные компоненты держат систему живой в продакшене</a>
   <ul class="collapse">
-  <li><a href="#что-такое-индекс" id="toc-что-такое-индекс" class="nav-link" data-scroll-target="#что-такое-индекс">Что такое индекс</a></li>
-  <li><a href="#почему-индекс-ускоряет-чтение-но-замедляет-запись" id="toc-почему-индекс-ускоряет-чтение-но-замедляет-запись" class="nav-link" data-scroll-target="#почему-индекс-ускоряет-чтение-но-замедляет-запись">Почему индекс ускоряет чтение, но замедляет запись</a></li>
-  <li><a href="#b-tree-как-индекс-по-умолчанию" id="toc-b-tree-как-индекс-по-умолчанию" class="nav-link" data-scroll-target="#b-tree-как-индекс-по-умолчанию">B-tree как индекс по умолчанию</a></li>
-  <li><a href="#hash-индекс" id="toc-hash-индекс" class="nav-link" data-scroll-target="#hash-индекс">Hash-индекс</a></li>
-  <li><a href="#bitmap-индекс" id="toc-bitmap-индекс" class="nav-link" data-scroll-target="#bitmap-индекс">Bitmap-индекс</a></li>
-  <li><a href="#как-выбирать-индекс" id="toc-как-выбирать-индекс" class="nav-link" data-scroll-target="#как-выбирать-индекс">Как выбирать индекс</a></li>
-  <li><a href="#связь-с-предыдущими-лекциями" id="toc-связь-с-предыдущими-лекциями" class="nav-link" data-scroll-target="#связь-с-предыдущими-лекциями">Связь с предыдущими лекциями</a></li>
+  <li><a href="#зачем-это-прикладному-инженеру" id="toc-зачем-это-прикладному-инженеру" class="nav-link" data-scroll-target="#зачем-это-прикладному-инженеру">Зачем это прикладному инженеру</a></li>
+  <li><a href="#типовые-возражения" id="toc-типовые-возражения" class="nav-link" data-scroll-target="#типовые-возражения">Типовые возражения</a></li>
+  <li><a href="#итог" id="toc-итог" class="nav-link" data-scroll-target="#итог">Итог</a></li>
   </ul></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Другие форматы</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>Typst</a></li></ul></div></nav>
@@ -202,7 +134,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Индексы: B-tree, hash и bitmap</h1>
+<h1 class="title">TL;DR: операционные компоненты держат систему живой в продакшене</h1>
 </div>
 
 
@@ -222,164 +154,30 @@ window.Quarto = {
 <!-- AUTOGENERATED-BACK-LINK -->
 <p><a href="../../../courses/ais/index.html" class="back-to-course">← Обратно к курсу</a></p>
 <!-- /AUTOGENERATED-BACK-LINK -->
-<section id="индексы-b-tree-hash-и-bitmap" class="level1">
-<h1>Индексы: B-tree, hash и bitmap</h1>
-<p>После лекций про B-дерево, LSM и физическое хранение строк полезно отделить два уровня разговора:</p>
+<section id="tldr-операционные-компоненты-держат-систему-живой-в-продакшене" class="level1">
+<h1>TL;DR: операционные компоненты держат систему живой в продакшене</h1>
+<p>За модуль мы разобрали:</p>
 <ul>
-<li><strong>структура хранения и цена I/O</strong>: immutable SSTable против mutable страниц;</li>
-<li><strong>тип индекса как способ доступа</strong>: B-tree, hash, bitmap и их пригодность под разные запросы.</li>
+<li><strong>Прокси и балансировка</strong> — кто стоит впереди приложения, как раздаются запросы между инстансами (Round Robin, Least Connections, Consistent Hashing) и зачем ставить лимит на частоту (Token Bucket, Sliding Window).</li>
+<li><strong>Безопасность и доступ</strong> — чем отличается аутентификация от авторизации, как RBAC и ABAC выражают права, как живут JWT и OAuth 2.0, и почему в больших компаниях всё сводится к SSO через SAML или OIDC.</li>
+<li><strong>Observability</strong> — три опоры наблюдаемости: структурированные логи, метрики в Prometheus, распределённые трейсы через OpenTelemetry. Плюс планировщики задач (Celery, Airflow, Dagster), которые отправляют тяжёлую работу в фон.</li>
 </ul>
-<p>Эта лекция про второй уровень: что вообще делает индекс и почему у разных индексов разные сильные стороны.</p>
-<section id="что-такое-индекс" class="level2">
-<h2 class="anchored" data-anchor-id="что-такое-индекс">Что такое индекс</h2>
-<p>Индекс в базе данных это отдельная структура, которая помогает найти нужные строки без полного сканирования таблицы.</p>
-<p>Без индекса запрос вида</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span> <span class="op">*</span> <span class="kw">from</span> users <span class="kw">where</span> email <span class="op">=</span> <span class="st">'a@b.c'</span>;</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
-<p>часто означает:</p>
-<ol type="1">
-<li>прочитать много страниц таблицы;</li>
-<li>проверить условие для каждой строки;</li>
-<li>выбрать подходящие строки.</li>
-</ol>
-<p>С индексом база сначала идёт в компактную вспомогательную структуру, находит нужный ключ, а уже потом переходит к данным. Обычно индекс хранит что-то вроде:</p>
-<p><span class="math display">\[
-\text{search key} \rightarrow \text{row id / page id / primary key}
-\]</span></p>
-<p>То есть индекс это не “таблица поменьше”, а <strong>дополнительный путь доступа</strong> к данным.</p>
+<section id="зачем-это-прикладному-инженеру" class="level2">
+<h2 class="anchored" data-anchor-id="зачем-это-прикладному-инженеру">Зачем это прикладному инженеру</h2>
+<p>Локально приложение хорошо работает у всех. Боль начинается в проде: трафик внезапно растёт, кто-то ломится в API с тысячей запросов в секунду, пользователь жалуется на ошибку, а её никто не воспроизводит. На эти ситуации отвечают именно операционные компоненты.</p>
+<p>Прокси и rate limiting закрывают вход: распределяют трафик, отсекают перегрузки, дают единую точку для SSL и кеша. Без них масштабирование сводится к героическим усилиям, а первый же бот кладёт сервис. Алгоритм балансировки выбирается под форму трафика: одинаковые stateless-инстансы дружат с Round Robin, долгие соединения — с Least Connections, а распределённый кеш живёт на Consistent Hashing, чтобы добавление узла не переразложило все ключи.</p>
+<p>Аутентификация и авторизация — два разных вопроса, которые часто склеивают. Первый отвечает «кто ты», второй — «что тебе можно». RBAC хорош для понятных иерархий, ABAC — там, где правила зависят от времени, IP, отдела или статуса MFA. JWT удобен для stateless-сервисов, но требует продумать отзыв токенов. OAuth и OIDC закрывают сценарии, где сторонним приложениям нужен доступ без передачи пароля.</p>
+<p>Observability — то, без чего поддерживать систему в проде невозможно. Логи отвечают на вопрос «что случилось», метрики — «сколько и как быстро», трейсы — «через какие сервисы прошёл запрос и где он завис». Структурированный JSON-лог с <code>trace_id</code> склеивает все три уровня в одну картину, а Prometheus + Grafana превращают эту картину в дашборды и алерты.</p>
 </section>
-<section id="почему-индекс-ускоряет-чтение-но-замедляет-запись" class="level2">
-<h2 class="anchored" data-anchor-id="почему-индекс-ускоряет-чтение-но-замедляет-запись">Почему индекс ускоряет чтение, но замедляет запись</h2>
-<p>Индекс экономит I/O на чтении, если запрос достаточно селективен: вместо чтения многих страниц таблицы можно прочитать несколько страниц индекса и затем перейти только к нужным строкам.</p>
-<p>Но за это приходится платить:</p>
-<ul>
-<li>при <code>insert</code> надо добавить запись и в таблицу, и в индекс;</li>
-<li>при <code>update</code> индекс может потребовать перестройки, если изменился индексируемый столбец;</li>
-<li>при <code>delete</code> запись нужно убрать или пометить удалённой и в таблице, и в индексе;</li>
-<li>чем больше индексов на таблице, тем дороже каждая запись.</li>
-</ul>
-<p>Поэтому индекс это всегда обмен: <strong>ускоряем часть чтений ценой памяти, диска и более дорогих записей</strong>.</p>
+<section id="типовые-возражения" class="level2">
+<h2 class="anchored" data-anchor-id="типовые-возражения">Типовые возражения</h2>
+<p>«У нас два инстанса, прокси не нужен» обычно длится ровно до первого инцидента: один процесс падает, и без балансировщика никто не уведёт трафик на живой. Прокси перед приложением окупается даже на двух репликах: SSL termination, единая точка логов, базовая защита от всплесков.</p>
+<p>«JWT решает все проблемы с сессиями» — отчасти. Stateless-валидация подписи действительно масштабируется лучше серверных сессий, но логика отзыва (logout, скомпрометированный токен, смена прав) добавляет либо короткий TTL с refresh-токенами, либо blacklist в кеше. Иначе токен действует до <code>exp</code>, и поделать с этим нечего.</p>
+<p>«Запустим — потом подключим логи и метрики» обычно превращается в отладку по <code>print</code> через SSH и нервную пятницу. Метрики и структурированные логи дешевле прикручивать сразу: позже их добавление упирается в рефакторинг каждого хендлера и обвязку трассировки.</p>
 </section>
-<section id="b-tree-как-индекс-по-умолчанию" class="level2">
-<h2 class="anchored" data-anchor-id="b-tree-как-индекс-по-умолчанию">B-tree как индекс по умолчанию</h2>
-<p>B-tree это самый универсальный индекс. Он хранит ключи в отсортированном порядке и поэтому умеет не только точечный поиск, но и работу с порядком ключей.</p>
-<p>Что B-tree делает хорошо:</p>
-<ul>
-<li>поиск по равенству: <code>=</code>, <code>IN</code>;</li>
-<li>диапазоны: <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>between</code>;</li>
-<li>префиксные условия;</li>
-<li><code>order by</code>, <code>min</code>, <code>max</code>;</li>
-<li>предсказуемое поведение на смешанной OLTP-нагрузке.</li>
-</ul>
-<p>Почему он универсален:</p>
-<ul>
-<li>ключи упорядочены;</li>
-<li>высота дерева мала из-за большого branching factor;</li>
-<li>чтение сводится к короткому пути по страницам;</li>
-<li>цена записи понятна: локальные split/merge страниц.</li>
-</ul>
-<p>Если нет специальной причины выбрать что-то ещё, на практике чаще всего начинают именно с B-tree.</p>
-</section>
-<section id="hash-индекс" class="level2">
-<h2 class="anchored" data-anchor-id="hash-индекс">Hash-индекс</h2>
-<p>Hash-индекс пропускает ключ через хеш-функцию и кладёт его в корзину:</p>
-<p><span class="math display">\[
-h(k) \rightarrow \text{bucket}
-\]</span></p>
-<p>Сильная сторона hash-индекса:</p>
-<ul>
-<li>очень быстрый поиск <strong>по точному равенству</strong>;</li>
-<li>хорош, когда запросы почти всегда выглядят как <code>where id = ...</code>.</li>
-</ul>
-<p>Ограничения:</p>
-<ul>
-<li>он не хранит ключи в сортированном порядке;</li>
-<li>не умеет диапазоны;</li>
-<li>не помогает для <code>order by</code>;</li>
-<li>плохо подходит для префиксного поиска.</li>
-</ul>
-<p>Именно поэтому hash-индекс уже, чем B-tree. Он может быть быстрее в своей узкой задаче, но как индекс “по умолчанию” почти всегда проигрывает B-tree по универсальности.</p>
-</section>
-<section id="bitmap-индекс" class="level2">
-<h2 class="anchored" data-anchor-id="bitmap-индекс">Bitmap-индекс</h2>
-<p>Bitmap-индекс особенно полезен там, где столбец принимает <strong>не очень много разных значений</strong>. Для каждого значения хранится битовая маска: в каком наборе строк это значение встречается.</p>
-<p>Пример для столбца <code>gender</code>:</p>
-<ul>
-<li>bitmap для <code>M</code>;</li>
-<li>bitmap для <code>F</code>.</li>
-</ul>
-<p>Для столбца <code>status</code>:</p>
-<ul>
-<li>bitmap для <code>new</code>;</li>
-<li>bitmap для <code>paid</code>;</li>
-<li>bitmap для <code>cancelled</code>.</li>
-</ul>
-<p>Почему это мощно в аналитике:</p>
-<ul>
-<li>фильтры можно быстро объединять через <code>AND</code>, <code>OR</code>, <code>NOT</code>;</li>
-<li>получается очень дешёвая работа с несколькими низкокардинальными предикатами;</li>
-<li>хорошо сжимается и хорошо подходит под DWH-нагрузки.</li>
-</ul>
-<p>Почему bitmap плох в OLTP:</p>
-<ul>
-<li>частые обновления заставляют постоянно править битовые векторы;</li>
-<li>при высокой кардинальности bitmap разрастается и теряет смысл;</li>
-<li>индекс менее удобен для точечных обновлений и горячих записей.</li>
-</ul>
-<p>Проще всего запомнить так: <strong>bitmap любит аналитику и редкие изменения, B-tree любит универсальность, hash любит точное равенство</strong>.</p>
-</section>
-<section id="как-выбирать-индекс" class="level2">
-<h2 class="anchored" data-anchor-id="как-выбирать-индекс">Как выбирать индекс</h2>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Тип запроса или нагрузки</th>
-<th>Что обычно выбирать</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>id = x</code>, точечный поиск</td>
-<td><code>B-tree</code>, иногда <code>hash</code></td>
-</tr>
-<tr class="even">
-<td><code>created_at between ...</code>, диапазоны</td>
-<td><code>B-tree</code></td>
-</tr>
-<tr class="odd">
-<td><code>order by</code>, <code>min</code>, <code>max</code></td>
-<td><code>B-tree</code></td>
-</tr>
-<tr class="even">
-<td>несколько фильтров по низкокардинальным полям в аналитике</td>
-<td><code>bitmap</code></td>
-</tr>
-<tr class="odd">
-<td>много записей, мало обновлений, OLAP/DWH</td>
-<td><code>bitmap</code> часто уместен</td>
-</tr>
-<tr class="even">
-<td>смешанная транзакционная нагрузка</td>
-<td><code>B-tree</code></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="связь-с-предыдущими-лекциями" class="level2">
-<h2 class="anchored" data-anchor-id="связь-с-предыдущими-лекциями">Связь с предыдущими лекциями</h2>
-<p>Теперь различие можно формулировать чище:</p>
-<ul>
-<li><strong>B-tree</strong> и <strong>LSM</strong> это прежде всего разговор о том, как структура живёт на диске и как она платит за I/O;</li>
-<li><strong>heap</strong> и <strong>clustered</strong> это разговор о том, где физически лежит полная строка таблицы;</li>
-<li><strong>B-tree, hash и bitmap</strong> это разговор о типах индексов и о том, какие запросы они ускоряют;</li>
-<li>при этом B-tree одновременно попадает в обе категории: это и дисковая структура, и самый распространённый тип индекса.</li>
-</ul>
-<p>Именно поэтому логично держать эти темы отдельно:</p>
-<ol type="1">
-<li><code>B-дерево</code>: mutable страницы, branching factor, split/merge, чтение с диска.</li>
-<li><code>LSM-дерево</code>: immutable файлы, flush, compaction, write amplification.</li>
-<li><code>Хранение строк и индексы</code>: heap, clustered и переход от индекса к полной строке.</li>
-<li><code>Индексы</code>: что такое индекс вообще, и когда выбирать B-tree, hash или bitmap.</li>
-</ol>
+<section id="итог" class="level2">
+<h2 class="anchored" data-anchor-id="итог">Итог</h2>
+<p>Операционные компоненты не делают бизнес-логику. Они отвечают за то, чтобы приложение выдержало реальный трафик, не пускало посторонних к чужим данным и продолжало работать предсказуемо, когда что-то ломается. Без прокси не масштабируешь, без аутентификации не выпустишь в интернет, без observability не починишь то, чего не видишь.</p>
 
 
 </section>
